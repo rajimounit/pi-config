@@ -10,7 +10,8 @@
     "npm:@ollama/pi-web-search",
     "npm:pi-mcp-adapter",
     "npm:lsp-pi",
-    "git:github.com/badlogic/pi-skills"
+    "git:github.com/badlogic/pi-skills",
+    "https://github.com/davebcn87/pi-autoresearch"
   ],
   "autoCompaction": true,
   "compactionThreshold": 0.8,
