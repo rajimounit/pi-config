@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi Agent — Guide Maître</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;
+  --bg2:#161616;
+  --bg3:#1e1e1e;
+  --bg4:#252525;
+  --border:#2a2a2a;
+  --border2:#333;
+  --text:#e8e8e8;
+  --text2:#a0a0a0;
+  --text3:#666;
+  --teal:#00d79b;
+  --teal-dim:#0f6e56;
+  --teal-bg:#0a1f17;
+  --blue:#4da6ff;
+  --blue-dim:#185fa5;
+  --blue-bg:#0a1525;
+  --amber:#f5a623;
+  --amber-bg:#1f1508;
+  --purple:#a78bfa;
+  --purple-bg:#160f2a;
+  --red:#f87171;
+  --red-bg:#1f0a0a;
+  --green:#4ade80;
+  --green-bg:#0a1f0f;
+  --radius:8px;
+  --radius-sm:5px;
+  --mono:'JetBrains Mono',monospace;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+
+/* Layout */
+.app{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
+.header{margin-bottom:2rem}
+.header-top{display:flex;align-items:center;gap:12px;margin-bottom:.4rem}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000}
+.title{font-size:20px;font-weight:600;color:var(--text)}
+.subtitle{font-size:12px;color:var(--text3);margin-left:44px}
+.header-badges{display:flex;gap:8px;margin-top:.75rem;margin-left:44px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;border:0.5px solid}
+.badge-green{background:var(--green-bg);color:var(--green);border-color:#1a4d2a}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border-color:#1a3a5c}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border-color:#4d3010}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border-color:#0f3d2a}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:3px;margin-bottom:1.5rem;overflow-x:auto}
+.tab{flex:1;min-width:80px;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:transparent;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--text);background:var(--bg3)}
+.tab.active{background:var(--bg4);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tab i{font-size:14px}
+
+/* Panels */
+.panel{display:none}
+.panel.active{display:block}
+
+/* Section */
+.section{margin-bottom:2rem}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+/* Card */
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:.75rem;transition:border-color .15s}
+.card:hover{border-color:var(--border2)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:.6rem;cursor:pointer}
+.card-header.no-expand{cursor:default}
+.icon-wrap{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-title{font-size:14px;font-weight:500;color:var(--text);flex:1}
+.card-meta{font-size:11px;font-family:var(--mono);color:var(--text3)}
+.card-chevron{color:var(--text3);font-size:14px;transition:transform .2s}
+.card-chevron.open{transform:rotate(180deg)}
+.card-body{font-size:13px;color:var(--text2);line-height:1.7}
+.card-body.collapsible{display:none}
+.card-body.collapsible.open{display:block}
+
+/* Status row */
+.status-row{display:flex;align-items:center;gap:8px;padding:.5rem 0;border-bottom:0.5px solid var(--border)}
+.status-row:last-child{border-bottom:none}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green)}
+.dot-red{background:var(--red)}
+.dot-amber{background:var(--amber)}
+.status-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.status-desc{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.status-tag{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600}
+.tag-ok{background:var(--green-bg);color:var(--green)}
+.tag-skip{background:var(--red-bg);color:var(--red)}
+
+/* Stack overview */
+.stack-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:600px){.stack-grid{grid-template-columns:1fr}}
+.stack-item{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem}
+.stack-item-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.4rem}
+.stack-item-value{font-size:13px;color:var(--text);font-weight:500}
+.stack-item-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Model matrix */
+.model-table{width:100%;border-collapse:collapse}
+.model-table th{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:.5rem .75rem;text-align:left;border-bottom:0.5px solid var(--border)}
+.model-table td{font-size:12px;color:var(--text2);padding:.6rem .75rem;border-bottom:0.5px solid var(--border);vertical-align:top}
+.model-table tr:last-child td{border-bottom:none}
+.model-table td:first-child{font-family:var(--mono);color:var(--text);font-size:11px;white-space:nowrap}
+.model-highlight{background:var(--bg3)}
+
+/* Code block */
+.code-block{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;font-family:var(--mono);font-size:11px;color:var(--teal);margin:.6rem 0;overflow-x:auto;line-height:1.8}
+.code-comment{color:var(--text3)}
+
+/* Step */
+.step{display:flex;gap:14px;margin-bottom:1rem;align-items:flex-start}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text);flex-shrink:0;margin-top:1px}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:.3rem}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.step-desc strong{color:var(--text);font-weight:500}
+
+/* Workflow card */
+.workflow{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;overflow:hidden}
+.workflow-header{display:flex;align-items:center;gap:10px;padding:.9rem 1.25rem;cursor:pointer;transition:background .15s}
+.workflow-header:hover{background:var(--bg3)}
+.workflow-num{font-size:12px;font-weight:700;color:var(--text3);min-width:20px}
+.workflow-title{font-size:14px;font-weight:500;color:var(--text);flex:1}
+.workflow-tag{font-size:10px;padding:2px 8px;border-radius:3px;font-weight:500}
+.workflow-body{padding:0 1.25rem 1rem;display:none;border-top:0.5px solid var(--border)}
+.workflow-body.open{display:block}
+.workflow-note{font-size:11px;color:var(--amber);background:var(--amber-bg);border:0.5px solid #4d3010;border-radius:var(--radius-sm);padding:.5rem .75rem;margin:.6rem 0;display:flex;align-items:flex-start;gap:7px}
+
+/* Veille */
+.veille-item{display:flex;gap:10px;align-items:flex-start;padding:.75rem 0;border-bottom:0.5px solid var(--border)}
+.veille-item:last-child{border-bottom:none}
+.veille-icon{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.veille-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:.2rem}
+.veille-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* Kbd */
+kbd{display:inline-block;background:var(--bg4);border:0.5px solid var(--border2);border-radius:3px;padding:1px 6px;font-family:var(--mono);font-size:11px;color:var(--text)}
+
+/* inline code */
+code{font-family:var(--mono);font-size:11px;background:var(--bg4);border:0.5px solid var(--border);border-radius:3px;padding:1px 5px;color:var(--teal)}
+
+/* divider */
+.divider{height:0.5px;background:var(--border);margin:.75rem 0}
+
+/* tag pill */
+.pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin:2px;font-weight:500;border:0.5px solid}
+.pill-teal{background:var(--teal-bg);color:var(--teal);border-color:#0f3d2a}
+.pill-blue{background:var(--blue-bg);color:var(--blue);border-color:#1a3a5c}
+.pill-purple{background:var(--purple-bg);color:var(--purple);border-color:#2d1f5c}
+.pill-amber{background:var(--amber-bg);color:var(--amber);border-color:#4d3010}
+.pill-red{background:var(--red-bg);color:var(--red);border-color:#4d1a1a}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">π</div>
+      <div class="title">Pi Agent — Guide Maître</div>
+    </div>
+    <div class="subtitle">WSL Ubuntu · RTX 3090 24GB · rajimounit/pi-config · Mai 2026</div>
+    <div class="header-badges">
+      <span class="badge badge-green"><i class="ti ti-cpu"></i> RTX 3090 CUDA</span>
+      <span class="badge badge-teal"><i class="ti ti-code"></i> llama.cpp 65k ctx</span>
+      <span class="badge badge-blue"><i class="ti ti-bolt"></i> Ollama + lsp-pi</span>
+      <span class="badge badge-amber"><i class="ti ti-package"></i> pi v0.74.0</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview')"><i class="ti ti-layout-dashboard"></i>Vue d'ensemble</button>
+    <button class="tab" onclick="showTab('paliers')"><i class="ti ti-check-box"></i>Paliers</button>
+    <button class="tab" onclick="showTab('modeles')"><i class="ti ti-brain"></i>Modèles</button>
+    <button class="tab" onclick="showTab('workflows')"><i class="ti ti-player-play"></i>Workflows</button>
+    <button class="tab" onclick="showTab('evolution')"><i class="ti ti-telescope"></i>Évolution</button>
+  </div>
+
+  <!-- PANEL: OVERVIEW -->
+  <div id="panel-overview" class="panel active">
+
+    <div class="section">
+      <div class="section-label">Stack actif</div>
+      <div class="stack-grid">
+        <div class="stack-item">
+          <div class="stack-item-label">Agent</div>
+          <div class="stack-item-value">Pi v0.74.0</div>
+          <div class="stack-item-sub">earendil-works/pi-mono · 0.74.1 dispo</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-item-label">GPU</div>
+          <div class="stack-item-value">RTX 3090 · 24 GB VRAM</div>
+          <div class="stack-item-sub">CUDA 12.6 · cc86 · CUDA 13.1 runtime</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-item-label">Backend primaire</div>
+          <div class="stack-item-value">Ollama</div>
+          <div class="stack-item-sub">localhost:11434 · toujours actif</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-item-label">Backend secondaire</div>
+          <div class="stack-item-value">llama.cpp CUDA</div>
+          <div class="stack-item-sub">127.0.0.1:8081 · à démarrer manuellement</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-item-label">Modèle défaut</div>
+          <div class="stack-item-value">ollama/pi-qwen3-35b</div>
+          <div class="stack-item-sub">temp=0.6 · top_p=0.95 · top_k=20</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-item-label">Config versionnée</div>
+          <div class="stack-item-value">rajimounit/pi-config</div>
+          <div class="stack-item-sub">~/.pi · git main · auto-load AGENTS.md</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Packages actifs</div>
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--teal-bg)"><i class="ti ti-puzzle" style="color:var(--teal);font-size:16px"></i></div>
+          <div class="card-title">Extensions installées</div>
+        </div>
+        <div class="card-body">
+          <span class="pill pill-teal">lsp-pi</span>
+          <span class="pill pill-teal">pi-subagents</span>
+          <span class="pill pill-teal">pi-memory</span>
+          <span class="pill pill-teal">pi-mcp-adapter</span>
+          <span class="pill pill-teal">pi-autoresearch</span>
+          <span class="pill pill-blue">badlogic/pi-skills</span>
+          <span class="pill pill-blue">@ollama/pi-web-search</span>
+          <span class="pill pill-blue">@plannotator/pi-extension</span>
+          <div style="margin-top:.75rem;font-size:12px;color:var(--text2)">
+            <strong style="color:var(--text)">badlogic/pi-skills</strong> expose : <code>brave-search</code> <code>browser-tools</code> <code>youtube-transcript</code> <code>transcribe</code> <code>gccli</code> <code>gdcli</code> <code>gmcli</code> <code>vscode</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Capacités clés</div>
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--green-bg)"><i class="ti ti-check" style="color:var(--green);font-size:16px"></i></div>
+          <div class="card-title">Ce que Pi sait faire maintenant</div>
+        </div>
+        <div class="card-body">
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Contexte 65 000 tokens garanti</div>
+            <div class="status-desc">via llama.cpp · lecture complète de gros repos</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Diagnostics TypeScript/Python en live</div>
+            <div class="status-desc">lsp-pi · erreurs retournées après chaque édition</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Compaction automatique du contexte</div>
+            <div class="status-desc">autoCompaction à 80% · continue sans interruption</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Recherche web locale (SearXNG / brave-search)</div>
+            <div class="status-desc">via pi-web-search + badlogic/brave-search</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Sous-agents parallèles</div>
+            <div class="status-desc">pi-subagents · /task pour déléguer une tâche</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Instructions persistantes inter-sessions</div>
+            <div class="status-desc">~/.pi/AGENTS.md · lu à chaque démarrage</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-green"></div>
+            <div class="status-name">Switching de modèle mid-session</div>
+            <div class="status-desc">Ctrl+P · 4 favoris · contexte conservé</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PANEL: PALIERS -->
+  <div id="panel-paliers" class="panel">
+
+    <div class="section">
+      <div class="section-label">Palier A — Quick wins (complété)</div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--teal-bg)"><i class="ti ti-bolt" style="color:var(--teal);font-size:15px"></i></div>
+          <div class="card-title">A1 — autoCompaction + favorites</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">settings.json</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Pi compacte automatiquement le contexte à 80% sans interruption. <kbd>Ctrl+P</kbd> donne accès aux 4 favoris.</p>
+          <div class="code-block"><span class="code-comment">// ~/.pi/agent/settings.json</span>
+"autoCompaction": true,
+"compactionThreshold": 0.8,
+"favorites": [
+  "ollama/pi-qwen3-35b",
+  "ollama/pi-qwen3-coder",
+  "ollama/pi-qwen25-coder-7b",
+  "ollama/deepseek-r1:32b"
+]</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--blue-bg)"><i class="ti ti-server-2" style="color:var(--blue);font-size:15px"></i></div>
+          <div class="card-title">A2 — Provider llama-cpp déclaré</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">models.json</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Pi connaît deux backends. Ollama reste le défaut. llama-cpp s'active quand le serveur tourne sur 8081.</p>
+          <div class="code-block"><span class="code-comment">// ~/.pi/agent/models.json</span>
+provider: "llama-cpp"
+baseURL: "http://127.0.0.1:8081/v1"
+contextWindow: 65536 (par modèle)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--amber-bg)"><i class="ti ti-file-text" style="color:var(--amber);font-size:15px"></i></div>
+          <div class="card-title">A3 — AGENTS.md global</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">~/.pi/AGENTS.md</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Règles permanentes lues à chaque session : lire avant d'éditer, vérifier après chaque changement, format de commit, quand s'arrêter, routing de modèle.</p>
+          <p style="margin-top:.5rem">Pour modifier : demander à Pi d'éditer <code>~/.pi/AGENTS.md</code> puis committer.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--purple-bg)"><i class="ti ti-code" style="color:var(--purple);font-size:15px"></i></div>
+          <div class="card-title">A4 — lsp-pi diagnostics live</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">npm:lsp-pi</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Après chaque édition de fichier, Pi reçoit les erreurs TypeScript et Python automatiquement. Actif sur <strong>TypeScript ✓ · Python ✓ · Go ✗</strong></p>
+          <div style="margin-top:.5rem">Flux : Pi édite .ts → LSP analyse → Erreurs retournées → Pi corrige</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Palier B — GPU + Modèles (complété partiellement)</div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--teal-bg)"><i class="ti ti-cpu" style="color:var(--teal);font-size:15px"></i></div>
+          <div class="card-title">B1 — llama.cpp CUDA RTX 3090</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">7acf399</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>llama-server compilé avec CUDA 12.6 + cuBLAS, cc8.6 (RTX 3090). Contexte 65 536 tokens. Script de démarrage à <code>~/.pi/start-llama.sh</code>.</p>
+          <div class="code-block"><span class="code-comment"># Modèle actif : Qwen3-Coder-30B-A3B-Instruct-Q4_K_M</span>
+~/.pi/start-llama.sh
+<span class="code-comment"># Vérifie :</span>
+curl -s http://127.0.0.1:8081/health</div>
+          <div class="workflow-note"><i class="ti ti-alert-triangle"></i> Fermer LM Studio avant de démarrer llama-server (VRAM partagée)</div>
+          <p style="margin-top:.5rem"><strong>Validé en conditions réelles :</strong> 110k tokens de fichiers AVV Assist Pro ingérés sans tronquer.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--red-bg)"><i class="ti ti-x" style="color:var(--red);font-size:15px"></i></div>
+          <div class="card-title">B2 — heart-of-gold / B3 — pi-agent-loops</div>
+          <span class="status-tag tag-skip">✗ Skip</span>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Packages introuvables sur npm et GitHub (aminrj, badlogic). Probablement des références aspirationnelles dans la source d'origine. Skippés définitivement — aucun mock créé.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--blue-bg)"><i class="ti ti-adjustments" style="color:var(--blue);font-size:15px"></i></div>
+          <div class="card-title">B4 — Modelfiles Qwen3 sampling</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">33ba7ed</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>3 Modelfiles créés dans <code>~/.pi/modelfiles/</code> avec les paramètres de sampling recommandés par l'équipe Qwen.</p>
+          <table class="model-table" style="margin-top:.5rem">
+            <tr><th>Modèle Ollama</th><th>temp</th><th>top_p</th><th>top_k</th></tr>
+            <tr><td>pi-qwen3-35b</td><td>0.6</td><td>0.95</td><td>20</td></tr>
+            <tr><td>pi-qwen3-coder</td><td>0.6</td><td>0.95</td><td>20</td></tr>
+            <tr><td>pi-qwen25-coder-7b</td><td>0.4</td><td>0.90</td><td>20</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Palier C — Extensions (complété)</div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--teal-bg)"><i class="ti ti-search" style="color:var(--teal);font-size:15px"></i></div>
+          <div class="card-title">C1 — pi-autoresearch</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">aad421d</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Boucle autonome benchmark depuis <code>davebcn87/pi-autoresearch</code>. Permet des cycles edit → score → commit/revert automatisés sur AVV Assist Pro.</p>
+          <p style="margin-top:.4rem">Skills exposés : <code>autoresearch-create</code> <code>autoresearch-finalize</code> <code>autoresearch-hooks</code></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--blue-bg)"><i class="ti ti-puzzle" style="color:var(--blue);font-size:15px"></i></div>
+          <div class="card-title">C2 — badlogic/pi-skills</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">ed4afea</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>8 skills installés depuis <code>github.com/badlogic/pi-skills</code> :</p>
+          <div style="margin-top:.4rem">
+            <span class="pill pill-blue">brave-search</span>
+            <span class="pill pill-blue">browser-tools</span>
+            <span class="pill pill-blue">youtube-transcript</span>
+            <span class="pill pill-blue">transcribe</span>
+            <span class="pill pill-blue">gccli</span>
+            <span class="pill pill-blue">gdcli</span>
+            <span class="pill pill-blue">gmcli</span>
+            <span class="pill pill-blue">vscode</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" onclick="toggleCard(this)">
+          <div class="icon-wrap" style="background:var(--amber-bg)"><i class="ti ti-route" style="color:var(--amber);font-size:15px"></i></div>
+          <div class="card-title">C3 — Routing rules AGENTS.md</div>
+          <span class="status-tag tag-ok">✓ OK</span>
+          <div class="card-meta">73eeea4</div>
+          <i class="ti ti-chevron-down card-chevron"></i>
+        </div>
+        <div class="card-body collapsible">
+          <p>Section "Model Routing" ajoutée à <code>~/.pi/AGENTS.md</code>. Pi sait automatiquement quand switcher vers llama-cpp, deepseek-r1, ou le 7B.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PANEL: MODÈLES -->
+  <div id="panel-modeles" class="panel">
+
+    <div class="section">
+      <div class="section-label">Matrice de décision</div>
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--teal-bg)"><i class="ti ti-table" style="color:var(--teal);font-size:15px"></i></div>
+          <div class="card-title">Quand utiliser quel modèle</div>
+        </div>
+        <div class="card-body">
+          <table class="model-table">
+            <tr>
+              <th>Modèle</th>
+              <th>Backend</th>
+              <th>Contexte</th>
+              <th>Utilisation idéale</th>
+            </tr>
+            <tr class="model-highlight">
+              <td>pi-qwen3-35b<br><span style="color:var(--text3);font-size:10px">défaut</span></td>
+              <td><span class="pill pill-teal" style="margin:0">Ollama</span></td>
+              <td>~32k</td>
+              <td>Sessions générales, questions, tâches courtes à moyennes sur AVV Assist Pro</td>
+            </tr>
+            <tr>
+              <td>pi-qwen3-coder</td>
+              <td><span class="pill pill-teal" style="margin:0">Ollama</span></td>
+              <td>~32k</td>
+              <td>Coding ciblé : écrire/refactorer un module précis, lsp-pi actif</td>
+            </tr>
+            <tr>
+              <td>pi-qwen25-coder-7b</td>
+              <td><span class="pill pill-teal" style="margin:0">Ollama</span></td>
+              <td>~16k</td>
+              <td>Grep, lookup, lecture rapide d'un seul fichier, VRAM contrainte</td>
+            </tr>
+            <tr>
+              <td>deepseek-r1:32b</td>
+              <td><span class="pill pill-teal" style="margin:0">Ollama</span></td>
+              <td>~32k</td>
+              <td>Architecture, debug complexe, raisonnement structuré</td>
+            </tr>
+            <tr class="model-highlight">
+              <td>llama-cpp/<br>qwen3-coder</td>
+              <td><span class="pill pill-blue" style="margin:0">llama.cpp</span></td>
+              <td><strong style="color:var(--teal)">65k</strong></td>
+              <td>Sessions longues sur gros repo, lecture complète backend AVV, >30k tokens</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Comment switcher</div>
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--purple-bg)"><i class="ti ti-arrows-exchange" style="color:var(--purple);font-size:15px"></i></div>
+          <div class="card-title">Switch mid-session (contexte conservé)</div>
+        </div>
+        <div class="card-body">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Appuyer sur <kbd>Ctrl+P</kbd> dans Pi</div>
+              <div class="step-desc">Ouvre le menu de sélection de modèle.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Sélectionner le modèle cible</div>
+              <div class="step-desc">4 favoris disponibles + <code>llama-cpp/qwen3-coder:latest</code> si le serveur tourne.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Continuer normalement</div>
+              <div class="step-desc">Le contexte de la session est <strong>intégralement conservé</strong> lors du switch.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Modèles GGUF disponibles sur /mnt/c</div>
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--bg4)"><i class="ti ti-file" style="color:var(--text2);font-size:15px"></i></div>
+          <div class="card-title">LM Studio models directory</div>
+        </div>
+        <div class="card-body">
+          <table class="model-table">
+            <tr><th>Fichier GGUF</th><th>Taille</th><th>Note</th></tr>
+            <tr><td>Qwen3-Coder-30B-A3B-Instruct-Q4_K_M</td><td>~17GB</td><td>Actif llama-cpp · MoE 3B actifs</td></tr>
+            <tr><td>Qwen2.5-Coder-32B-Q4_K_M</td><td>~19GB</td><td>Dense · ctx &lt;32k avec 24GB VRAM</td></tr>
+            <tr><td>Qwen2.5-Coder-7B-Instruct-Q4_K_S</td><td>~4.2GB</td><td>Léger · fallback rapide</td></tr>
+            <tr><td>Qwen3.5-9B.Q4_K_M</td><td>~5.5GB</td><td>Modèle Neog principal</td></tr>
+            <tr><td>Qwopus-GLM-18B-Healed-Q4_K_S</td><td>~10GB</td><td>Disponible</td></tr>
+            <tr><td>Qwen3-VL-8B-Instruct-Q4_K_M</td><td>~5GB</td><td>Vision — analyses screenshots</td></tr>
+            <tr><td>gemma-4-26B-A4B-it-Q4_K_M</td><td>~15GB</td><td>MoE 4B actifs · alternatif</td></tr>
+            <tr><td>bge-m3-Q8_0</td><td>~1GB</td><td>Embeddings / recherche sémantique</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PANEL: WORKFLOWS -->
+  <div id="panel-workflows" class="panel">
+
+    <div class="section">
+      <div class="section-label">Workflows opérationnels</div>
+
+      <div class="workflow">
+        <div class="workflow-header" onclick="toggleWorkflow(this)">
+          <div class="workflow-num">01</div>
+          <div class="workflow-title">Session standard — Coding AVV Assist Pro</div>
+          <span class="workflow-tag" style="background:var(--teal-bg);color:var(--teal);border:0.5px solid #0f3d2a">Usage quotidien</span>
+          <i class="ti ti-chevron-down card-chevron" style="color:var(--text3);font-size:14px;margin-left:8px;transition:transform .2s"></i>
+        </div>
+        <div class="workflow-body">
+          <div style="height:.75rem"></div>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Ouvrir un terminal WSL</div>
+              <div class="step-desc">Ollama tourne en arrière-plan — rien à démarrer.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Se placer dans le repo AVV Assist Pro</div>
+              <div class="step-desc"><div class="code-block">cd ~/git/local-setup/avvAssistv3/avv-assist-pro-v3
+pi</div>
+              Pi démarre avec <code>pi-qwen3-35b</code> par défaut + AGENTS.md chargé automatiquement.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Optionnel : basculer vers pi-qwen3-coder pour du coding ciblé</div>
+              <div class="step-desc"><kbd>Ctrl+P</kbd> → <code>ollama/pi-qwen3-coder</code>. Idéal pour écrire/modifier un module NestJS avec lsp-pi actif.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Travailler normalement</div>
+              <div class="step-desc">lsp-pi retourne les erreurs TypeScript après chaque édition. autoCompaction gère le contexte. Aucune intervention manuelle.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-header" onclick="toggleWorkflow(this)">
+          <div class="workflow-num">02</div>
+          <div class="workflow-title">Session longue — Lecture gros repo / 64k context</div>
+          <span class="workflow-tag" style="background:var(--blue-bg);color:var(--blue);border:0.5px solid #1a3a5c">llama.cpp requis</span>
+          <i class="ti ti-chevron-down card-chevron" style="color:var(--text3);font-size:14px;margin-left:8px;transition:transform .2s"></i>
+        </div>
+        <div class="workflow-body">
+          <div style="height:.75rem"></div>
+          <div class="workflow-note"><i class="ti ti-alert-triangle"></i> Fermer LM Studio avant de continuer — il occupe ~1.5GB de VRAM partagée.</div>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Démarrer llama-server (terminal dédié)</div>
+              <div class="step-desc"><div class="code-block">~/.pi/start-llama.sh
+<span class="code-comment"># Attendre : "model loaded" + "listening on :8081"
+# Chargement ~2 minutes (Qwen3-Coder-30B-A3B)</span></div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Vérifier que le serveur répond</div>
+              <div class="step-desc"><div class="code-block">curl -s http://127.0.0.1:8081/health
+<span class="code-comment"># Attendu : {"status":"ok"}</span></div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Lancer Pi dans le repo cible</div>
+              <div class="step-desc"><div class="code-block">cd ~/git/local-setup/avvAssistv3/avv-assist-pro-v3
+pi</div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Basculer sur llama-cpp</div>
+              <div class="step-desc"><kbd>Ctrl+P</kbd> → <code>llama-cpp/qwen3-coder:latest</code>. Vérifier "(llama-cpp) qwen3-coder:latest" en bas à droite.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-title">Travailler avec 65 000 tokens de contexte</div>
+              <div class="step-desc">Pi peut lire l'ensemble du backend NestJS en une passe. Aucune troncature silencieuse.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-header" onclick="toggleWorkflow(this)">
+          <div class="workflow-num">03</div>
+          <div class="workflow-title">Debug d'architecture — deepseek-r1</div>
+          <span class="workflow-tag" style="background:var(--purple-bg);color:var(--purple);border:0.5px solid #2d1f5c">Raisonnement</span>
+          <i class="ti ti-chevron-down card-chevron" style="color:var(--text3);font-size:14px;margin-left:8px;transition:transform .2s"></i>
+        </div>
+        <div class="workflow-body">
+          <div style="height:.75rem"></div>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Lancer Pi normalement</div>
+              <div class="step-desc">Depuis le repo concerné.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Switcher vers deepseek-r1:32b</div>
+              <div class="step-desc"><kbd>Ctrl+P</kbd> → <code>ollama/deepseek-r1:32b</code>. Idéal pour : décision d'architecture, analyse d'un bug non-trivial, validation d'approche.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Retourner sur qwen3-coder pour l'implémentation</div>
+              <div class="step-desc"><kbd>Ctrl+P</kbd> → <code>ollama/pi-qwen3-coder</code>. Le contexte de l'analyse est conservé, Pi implémente avec les conclusions de deepseek.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-header" onclick="toggleWorkflow(this)">
+          <div class="workflow-num">04</div>
+          <div class="workflow-title">Mise à jour de Pi Agent</div>
+          <span class="workflow-tag" style="background:var(--amber-bg);color:var(--amber);border:0.5px solid #4d3010">Maintenance</span>
+          <i class="ti ti-chevron-down card-chevron" style="color:var(--text3);font-size:14px;margin-left:8px;transition:transform .2s"></i>
+        </div>
+        <div class="workflow-body">
+          <div style="height:.75rem"></div>
+          <div class="workflow-note"><i class="ti ti-alert-triangle"></i> Pi v0.74.1 est disponible. Tester dans une session isolée avant d'adopter définitivement.</div>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">Vérifier le changelog avant de mettre à jour</div>
+              <div class="step-desc"><div class="code-block">pi changelog
+<span class="code-comment"># Ou : https://github.com/earendil-works/pi-mono/blob/main/packages/coding-agent/CHANGELOG.md</span></div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Sauvegarder la config Pi</div>
+              <div class="step-desc"><div class="code-block">cd ~/.pi && git add -A && git commit -m "chore: snapshot avant update pi"</div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">Mettre à jour</div>
+              <div class="step-desc"><div class="code-block">pi update</div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">Vérifier que les packages sont toujours actifs</div>
+              <div class="step-desc"><div class="code-block">pi list
+<span class="code-comment"># Tous les packages doivent apparaître</span></div></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-title">Committer l'état post-update</div>
+              <div class="step-desc"><div class="code-block">cd ~/.pi && git add -A && git commit -m "chore: pi update vX.XX.X"
+git push</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANEL: ÉVOLUTION -->
+  <div id="panel-evolution" class="panel">
+
+    <div class="section">
+      <div class="section-label">Prochaines actions immédiates</div>
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--amber-bg)"><i class="ti ti-list-check" style="color:var(--amber);font-size:15px"></i></div>
+          <div class="card-title">Actions prioritaires</div>
+        </div>
+        <div class="card-body">
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Mettre à jour Pi vers v0.74.1</div>
+            <div class="status-desc">pi update — voir workflow 04</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Enrichir AGENTS.md avec règles AVV Assist Pro</div>
+            <div class="status-desc">"ne jamais exposer de clé API en frontend", "valider JSON LLM avant injection"</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Créer un AGENTS.md local dans le repo AVV Assist Pro</div>
+            <div class="status-desc">~/.../avv-assist-pro-v3/AGENTS.md · règles locales qui s'ajoutent au global</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Ajouter qwen3-vl:8b aux favorites Ollama</div>
+            <div class="status-desc">Analyse de screenshots, maquettes, PDFs dans Pi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Veille technologique</div>
+
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--teal-bg)"><i class="ti ti-rss" style="color:var(--teal);font-size:15px"></i></div>
+          <div class="card-title">Sources à suivre</div>
+        </div>
+        <div class="card-body">
+          <div class="veille-item">
+            <div class="veille-icon" style="background:var(--teal-bg)"><i class="ti ti-brand-github" style="color:var(--teal)"></i></div>
+            <div>
+              <div class="veille-title">earendil-works/pi-mono</div>
+              <div class="veille-desc">Releases Pi Agent. Surveiller les changelogs pour nouveaux packages, nouvelles commandes slash, améliorations lsp-pi.</div>
+            </div>
+          </div>
+          <div class="veille-item">
+            <div class="veille-icon" style="background:var(--blue-bg)"><i class="ti ti-brand-github" style="color:var(--blue)"></i></div>
+            <div>
+              <div class="veille-title">ggerganov/llama.cpp</div>
+              <div class="veille-desc">Releases llama.cpp. Flash attention, KV cache quantisé (q8_0), nouveaux flags de performance. Reconstruire si gain significatif.</div>
+            </div>
+          </div>
+          <div class="veille-item">
+            <div class="veille-icon" style="background:var(--purple-bg)"><i class="ti ti-brand-github" style="color:var(--purple)"></i></div>
+            <div>
+              <div class="veille-title">badlogic/pi-skills</div>
+              <div class="veille-desc">Nouveaux skills ajoutés régulièrement. <code>pi update</code> pour rafraîchir. Surveiller l'ajout de skills vision et MCP.</div>
+            </div>
+          </div>
+          <div class="veille-item">
+            <div class="veille-icon" style="background:var(--amber-bg)"><i class="ti ti-brain" style="color:var(--amber)"></i></div>
+            <div>
+              <div class="veille-title">Nouveaux modèles Qwen / DeepSeek</div>
+              <div class="veille-desc">Qwen3-Coder MoE évolue vite. Suivre les releases GGUF sur LM Studio Catalog et HuggingFace bartowski. Priorité aux modèles MoE qui rentrent dans 24GB à 65k context.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--purple-bg)"><i class="ti ti-road" style="color:var(--purple);font-size:15px"></i></div>
+          <div class="card-title">Palier D — Évolutions futures</div>
+        </div>
+        <div class="card-body">
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Flash attention + KV cache quantisé</div>
+            <div class="status-desc">Reconstruire llama.cpp avec -DGGML_CUDA_FA=ON --cache-type-k q8_0 → gain mémoire 30%</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Vision dans Pi (qwen3-vl:8b)</div>
+            <div class="status-desc">Ollama pull qwen3-vl:8b → ajouter aux favorites → analyser des screenshots directement</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">pi-autoresearch sur AVV Assist Pro</div>
+            <div class="status-desc">Créer checks.sh + benchmark cible → activer boucle autonome edit→score→commit/revert</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Script start-llama.sh évolué</div>
+            <div class="status-desc">Support multi-modèles : start-llama.sh 30b | start-llama.sh 7b | start-llama.sh 32b</div>
+          </div>
+          <div class="status-row">
+            <div class="status-dot dot-amber"></div>
+            <div class="status-name">Embeddings locaux avec bge-m3</div>
+            <div class="status-desc">bge-m3-Q8_0 déjà disponible sur /mnt/c → intégrer avec pi-memory pour RAG sur codebase</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header no-expand">
+          <div class="icon-wrap" style="background:var(--green-bg)"><i class="ti ti-refresh" style="color:var(--green);font-size:15px"></i></div>
+          <div class="card-title">Comment maintenir ce guide à jour</div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--text2)">Ce guide vit dans <code>~/.pi/docs/pi-agent-guide.html</code> et est versionné dans <code>rajimounit/pi-config</code>.</p>
+          <div style="margin-top:.75rem">
+            <p style="font-size:12px;color:var(--text2);margin-bottom:.4rem">Pour mettre à jour après un nouveau Palier :</p>
+            <div class="code-block">cd ~/.pi
+<span class="code-comment"># Demander à Pi de mettre à jour le guide</span>
+"Mets à jour ~/.pi/docs/pi-agent-guide.html avec [description des changements]"
+git add docs/pi-agent-guide.html
+git commit -m "docs: mise à jour guide master [date]"
+git push</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.card-chevron');
+  if (body && body.classList.contains('collapsible')) {
+    body.classList.toggle('open');
+    if (chevron) chevron.classList.toggle('open');
+  }
+}
+
+function toggleWorkflow(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.card-chevron');
+  body.classList.toggle('open');
+  if (chevron) chevron.classList.toggle('open');
+}
+</script>
+</body>
+</html>
