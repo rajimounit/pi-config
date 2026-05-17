@@ -10,7 +10,7 @@ export PATH=/usr/local/cuda-12.6/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-12.6/targets/x86_64-linux/lib:/usr/lib/wsl/lib
 
 MODE="${1:-server}"
-GGUF="/tmp/Qwen2.5-7B-Q4_K_S.gguf"
+GGUF="/mnt/c/LM Studio/models/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
 
 case "$MODE" in
   server)
@@ -20,7 +20,7 @@ case "$MODE" in
       --host 127.0.0.1 \
       --port 8081 \
       --n-gpu-layers 99 \
-      --n-threads 4 \
+            --ctx-size 65536 \
       --log-disable
     ;;
   cli)
@@ -28,7 +28,7 @@ case "$MODE" in
     bin/llama-cli \
       --model "$GGUF" \
       --n-gpu-layers 99 \
-      --n-threads 4
+            --ctx-size 65536 \
     ;;
   *)
     echo "Usage: $0 [server|cli]"
