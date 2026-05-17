@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi Agent — Palier A Guide</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+</head>
+<body style="font-family:system-ui,sans-serif;background:#f8f8f7;color:#1a1a1a;padding:2rem;max-width:780px;margin:0 auto">
+<h1 style="font-size:18px;font-weight:500;margin-bottom:.2rem">Pi Agent — Palier A</h1>
+<p style="font-size:13px;color:#888;margin-bottom:2rem">Guide d'utilisation · Mai 2026 · rajimounit/pi-config</p>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif}
+.section{margin-bottom:2rem}
+.section-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:.75rem}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:.75rem}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:.6rem}
+.icon-wrap{width:32px;height:32px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.card-file{font-size:11px;font-family:var(--font-mono);color:var(--color-text-tertiary);margin-left:auto}
+.benefit{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:.5rem}
+.benefit strong{font-weight:500;color:var(--color-text-primary)}
+.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.75rem}
+.usage-item{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.6rem .8rem}
+.usage-key{font-size:11px;font-weight:500;color:var(--color-text-tertiary);margin-bottom:3px;font-family:var(--font-mono)}
+.usage-val{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.divider{height:0.5px;background:var(--color-border-tertiary);margin:.75rem 0}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-right:4px;margin-bottom:4px;font-weight:500}
+.tag-teal{background:#E1F5EE;color:#0F6E56}
+.tag-blue{background:#E6F1FB;color:#185FA5}
+.tag-amber{background:#FAEEDA;color:#854F0B}
+.tag-purple{background:#EEEDFE;color:#3C3489}
+.idea-list{margin-top:.75rem}
+.idea{display:flex;gap:8px;align-items:flex-start;margin-bottom:.5rem}
+.idea-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.idea-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.idea-text strong{font-weight:500;color:var(--color-text-primary)}
+.cmd{display:inline-block;font-family:var(--font-mono);font-size:11px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:1px 6px;color:var(--color-text-primary)}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:.5rem}
+.flow-step{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 10px;font-size:12px;color:var(--color-text-secondary)}
+.flow-arrow{color:var(--color-text-tertiary);font-size:12px}
+.stack-badge{display:flex;align-items:center;gap:6px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.5rem .75rem;margin-bottom:.4rem}
+.stack-num{font-size:13px;font-weight:500;color:var(--color-text-primary);min-width:20px}
+.stack-desc{font-size:12px;color:var(--color-text-secondary)}
+</style>
+
+<h2 class="sr-only">Guide d'utilisation du Palier A — 4 améliorations apportées à Pi Agent</h2>
+
+<div style="padding:1rem 0">
+
+<div class="section">
+  <div class="section-label">Ce qui a été installé — Palier A</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="icon-wrap" style="background:#E1F5EE"><i class="ti ti-bolt" style="font-size:16px;color:#0F6E56" aria-hidden="true"></i></div>
+      <div class="card-title">autoCompaction + favorites</div>
+      <div class="card-file">settings.json</div>
+    </div>
+    <div class="benefit">Pi Agent <strong>compacte automatiquement</strong> le contexte à 80% de capacité — sans intervention manuelle. Tu ne tombes plus sur une erreur de contexte saturé en milieu de session.</div>
+    <div class="divider"></div>
+    <div class="usage-grid">
+      <div class="usage-item">
+        <div class="usage-key">Switching modèle</div>
+        <div class="usage-val"><span class="cmd">Ctrl+P</span> pour cycler les 4 favoris configurés</div>
+      </div>
+      <div class="usage-item">
+        <div class="usage-key">Compaction auto</div>
+        <div class="usage-val">Rien à faire — Pi compacte et continue seul</div>
+      </div>
+      <div class="usage-item">
+        <div class="usage-key">Forcer compaction</div>
+        <div class="usage-val"><span class="cmd">/compact</span> à tout moment si besoin</div>
+      </div>
+      <div class="usage-item">
+        <div class="usage-key">Favoris actifs</div>
+        <div class="usage-val">qwen3.6, qwen3-coder, qwen2.5-coder, deepseek-r1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="icon-wrap" style="background:#E6F1FB"><i class="ti ti-server-2" style="font-size:16px;color:#185FA5" aria-hidden="true"></i></div>
+      <div class="card-title">Provider llama-cpp déclaré</div>
+      <div class="card-file">models.json</div>
+    </div>
+    <div class="benefit">Pi Agent connaît maintenant <strong>deux backends</strong>. Ollama reste le défaut. Quand tu démarreras llama-server sur le port 8081, Pi pourra l'utiliser avec <strong>64k tokens de contexte</strong> garanti — là où Ollama tronque silencieusement.</div>
+    <div class="divider"></div>
+    <div class="flow">
+      <div class="flow-step">Ollama (défaut)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Démarrage rapide</div>
+      <div class="flow-arrow">·</div>
+      <div class="flow-step">llama.cpp (Palier B)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">64k context / flash-attn</div>
+    </div>
+    <div style="margin-top:.6rem;font-size:12px;color:var(--color-text-tertiary)">Activation : <span class="cmd">Ctrl+P</span> puis sélectionner <span class="cmd">llama-cpp/qwen3-coder:latest</span> quand le serveur tourne</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="icon-wrap" style="background:#FAEEDA"><i class="ti ti-file-text" style="font-size:16px;color:#854F0B" aria-hidden="true"></i></div>
+      <div class="card-title">AGENTS.md — instructions globales</div>
+      <div class="card-file">~/.pi/AGENTS.md</div>
+    </div>
+    <div class="benefit">Pi Agent lit ce fichier <strong>à chaque nouvelle session</strong>. Il contient tes règles permanentes : lire avant d'éditer, vérifier après chaque changement, format de commit, quand s'arrêter.</div>
+    <div class="divider"></div>
+    <div class="usage-grid">
+      <div class="usage-item">
+        <div class="usage-key">Effet immédiat</div>
+        <div class="usage-val">Comportement cohérent sur tous tes projets sans répéter les instructions</div>
+      </div>
+      <div class="usage-item">
+        <div class="usage-key">Pour modifier</div>
+        <div class="usage-val">Demander à Pi d'éditer <span class="cmd">~/.pi/AGENTS.md</span> puis committer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="icon-wrap" style="background:#EEEDFE"><i class="ti ti-code" style="font-size:16px;color:#3C3489" aria-hidden="true"></i></div>
+      <div class="card-title">lsp-pi — diagnostics live</div>
+      <div class="card-file">npm:lsp-pi</div>
+    </div>
+    <div class="benefit">Après chaque édition de fichier, Pi Agent reçoit <strong>automatiquement les erreurs TypeScript et Python</strong> du compilateur — sans que tu lances un test. Il peut corriger dans la foulée.</div>
+    <div class="divider"></div>
+    <div class="flow">
+      <div class="flow-step">Pi édite un fichier .ts</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">LSP analyse</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Erreurs retournées</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Pi corrige</div>
+    </div>
+    <div style="margin-top:.6rem;font-size:12px;color:var(--color-text-tertiary)">Actif sur TypeScript ✓ · Python ✓ · Go ✗ (désactivé)</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Utilisation quotidienne optimale</div>
+
+  <div class="card">
+    <div class="stack-badge">
+      <div class="stack-num">1</div>
+      <div class="stack-desc"><strong style="color:var(--color-text-primary)">Session courte, question ciblée</strong> — lancer Pi sans changer de modèle. qwen3.6:35b-a3b par défaut, autoCompaction gère le contexte.</div>
+    </div>
+    <div class="stack-badge">
+      <div class="stack-num">2</div>
+      <div class="stack-desc"><strong style="color:var(--color-text-primary)">Coding AVV Assist Pro</strong> — lancer Pi dans le repo. <span class="cmd">Ctrl+P</span> → qwen3-coder:latest. lsp-pi corrige les erreurs TS en temps réel.</div>
+    </div>
+    <div class="stack-badge">
+      <div class="stack-num">3</div>
+      <div class="stack-desc"><strong style="color:var(--color-text-primary)">Analyse d'architecture / debug profond</strong> — <span class="cmd">Ctrl+P</span> → deepseek-r1:32b. Raisonnement structuré sur des problèmes non-triviaux.</div>
+    </div>
+    <div class="stack-badge">
+      <div class="stack-num">4</div>
+      <div class="stack-desc"><strong style="color:var(--color-text-primary)">Lecture rapide / grep / lookup</strong> — <span class="cmd">Ctrl+P</span> → qwen2.5-coder:7b. Réponse en secondes, faible VRAM.</div>
+    </div>
+    <div class="stack-badge">
+      <div class="stack-num">5</div>
+      <div class="stack-desc"><strong style="color:var(--color-text-primary)">Session longue sur gros repo</strong> — démarrer llama-server (Palier B), puis <span class="cmd">Ctrl+P</span> → llama-cpp/qwen3-coder. 64k tokens, aucune troncature.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Idées à exploiter maintenant</div>
+  <div class="card">
+    <div class="idea-list">
+      <div class="idea"><div class="idea-dot" style="background:#0F6E56"></div><div class="idea-text"><strong>Enrichir AGENTS.md</strong> avec des règles spécifiques à AVV Assist Pro — ex: "ne jamais exposer de clé API en frontend", "toujours valider le JSON LLM avant injection base". Pi les respectera sur tous tes projets.</div></div>
+      <div class="idea"><div class="idea-dot" style="background:#185FA5"></div><div class="idea-text"><strong>Créer un AGENTS.md par projet</strong> dans le repo AVV Assist Pro — règles locales qui s'ajoutent au global. Pi lit les deux en cascade.</div></div>
+      <div class="idea"><div class="idea-dot" style="background:#854F0B"></div><div class="idea-text"><strong>Profiter du lsp-pi sur NestJS</strong> — demander à Pi de refactorer un module entier de backend. Le LSP va valider TypeScript en continu et réduire les cycles d'aller-retour à zéro.</div></div>
+      <div class="idea"><div class="idea-dot" style="background:#3C3489"></div><div class="idea-text"><strong>Tester le switching de modèle mid-session</strong> — commencer en qwen3-coder pour écrire du code, <span class="cmd">Ctrl+P</span> → deepseek-r1 pour valider l'architecture, retour qwen3-coder pour implémenter. Le contexte est conservé entre les switches.</div></div>
+      <div class="idea"><div class="idea-dot" style="background:#993556"></div><div class="idea-text"><strong>Ajouter un modèle vision aux favorites</strong> — inclure <span class="cmd">ollama/qwen3-vl:8b</span> dans la liste favorites pour analyser des screenshots ou maquettes directement dans Pi.</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
