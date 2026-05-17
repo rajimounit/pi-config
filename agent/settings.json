@@ -1,6 +1,6 @@
 {
   "defaultProvider": "ollama",
-  "defaultModel": "qwen3.6:35b-a3b",
+  "defaultModel": "ollama/pi-qwen3-35b",
   "defaultThinkingLevel": "none",
   "lastChangelogVersion": "0.74.0",
   "packages": [
@@ -14,9 +14,9 @@
   "autoCompaction": true,
   "compactionThreshold": 0.8,
   "favorites": [
-    "ollama/qwen3.6:35b-a3b",
-    "ollama/qwen3-coder:latest",
-    "ollama/qwen2.5-coder:7b",
+    "ollama/pi-qwen3-35b",
+    "ollama/pi-qwen3-coder",
+    "ollama/pi-qwen25-coder-7b",
     "ollama/deepseek-r1:32b"
   ],
   "lsp": {
