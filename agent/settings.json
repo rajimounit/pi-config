@@ -9,7 +9,8 @@
     "npm:@plannotator/pi-extension",
     "npm:@ollama/pi-web-search",
     "npm:pi-mcp-adapter",
-    "npm:lsp-pi"
+    "npm:lsp-pi",
+    "git:github.com/badlogic/pi-skills"
   ],
   "autoCompaction": true,
   "compactionThreshold": 0.8,
