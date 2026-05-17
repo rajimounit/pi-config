@@ -1,0 +1,6 @@
+FROM qwen3-vl:8b
+PARAMETER temperature 0.4
+PARAMETER top_p 0.90
+PARAMETER top_k 20
+PARAMETER repeat_penalty 1.0
+SYSTEM "You are a precise vision assistant. Analyze images, screenshots, and diagrams accurately."

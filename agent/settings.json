@@ -21,7 +21,8 @@
     "ollama/pi-qwen3-35b",
     "ollama/pi-qwen3-coder",
     "ollama/pi-qwen25-coder-7b",
-    "ollama/deepseek-r1:32b"
+    "ollama/deepseek-r1:32b",
+    "ollama/pi-qwen3-vl"
   ],
   "lsp": {
     "typescript": true,
