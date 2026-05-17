@@ -8,14 +8,20 @@
     "npm:pi-subagents",
     "npm:@plannotator/pi-extension",
     "npm:@ollama/pi-web-search",
-    "npm:pi-mcp-adapter"
+    "npm:pi-mcp-adapter",
+    "npm:lsp-pi"
   ],
   "autoCompaction": true,
-  "compactionThreshold": 0.80,
+  "compactionThreshold": 0.8,
   "favorites": [
     "ollama/qwen3.6:35b-a3b",
     "ollama/qwen3-coder:latest",
     "ollama/qwen2.5-coder:7b",
     "ollama/deepseek-r1:32b"
-  ]
+  ],
+  "lsp": {
+    "typescript": true,
+    "python": true,
+    "go": false
+  }
 }
