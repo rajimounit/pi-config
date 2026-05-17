@@ -30,3 +30,23 @@ S'arreter uniquement si :
 1. Un secret ou credential absent du repo est necessaire
 2. Une action destructive n'a pas de rollback clair
 3. La spec est genuinement ambigue (pas juste complexe)
+
+## Model Routing
+
+Default: ollama/pi-qwen3-35b (fast start, most tasks)
+
+Switch to llama-cpp when:
+- Session will exceed 30k tokens (large repo reads, full module analysis)
+- Task requires guaranteed 64k context (AVV Assist Pro full backend read)
+- Ollama silently truncates responses
+
+Switch command: Ctrl+P then select llama-cpp/qwen3-coder:latest
+Start llama server first: ~/.pi/start-llama.sh
+
+Switch to pi-qwen25-coder-7b when:
+- Quick lookup, grep, single file read
+- VRAM is constrained (other processes running)
+
+Switch to deepseek-r1:32b when:
+- Architecture decision needed
+- Non-trivial debugging requiring structured reasoning
