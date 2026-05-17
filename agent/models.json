@@ -9,18 +9,89 @@
         "supportsReasoningEffort": false
       },
       "models": [
-        { "id": "qwen2.5-coder:7b" },
-        { "id": "bge-m3:latest" },
-        { "id": "qwen3-vl:8b" },
-        { "id": "qwen3.6-27b-q5:latest" },
-        { "id": "devstral-small-2:latest" },
-        { "id": "qwen3-embedding:latest" },
-        { "id": "deepseek-r1:32b" },
-        { "id": "qwen3:30b" },
-        { "id": "gemma4:31b" },
-        { "id": "gemma4:26b" },
-        { "id": "qwen3-coder:latest" },
-        { "id": "qwen3.6:35b-a3b" }
+        {
+          "id": "qwen2.5-coder:7b"
+        },
+        {
+          "id": "bge-m3:latest"
+        },
+        {
+          "id": "qwen3-vl:8b"
+        },
+        {
+          "id": "qwen3.6-27b-q5:latest"
+        },
+        {
+          "id": "devstral-small-2:latest"
+        },
+        {
+          "id": "qwen3-embedding:latest"
+        },
+        {
+          "id": "deepseek-r1:32b"
+        },
+        {
+          "id": "qwen3:30b"
+        },
+        {
+          "id": "gemma4:31b"
+        },
+        {
+          "id": "gemma4:26b"
+        },
+        {
+          "id": "qwen3-coder:latest"
+        },
+        {
+          "id": "qwen3.6:35b-a3b"
+        }
+      ]
+    },
+    "llama-cpp": {
+      "baseUrl": "http://127.0.0.1:8081/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false
+      },
+      "models": [
+        {
+          "id": "qwen3-coder:latest",
+          "name": "Qwen3-Coder (llama.cpp primary)",
+          "contextWindow": 32768,
+          "maxTokens": 8192,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        },
+        {
+          "id": "qwen3.6:35b-a3b",
+          "name": "Qwen3.6 35B MoE (llama.cpp reasoning)",
+          "contextWindow": 32768,
+          "maxTokens": 8192,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        },
+        {
+          "id": "qwen2.5-coder:7b",
+          "name": "Qwen2.5-Coder 7B (llama.cpp fast)",
+          "contextWindow": 16384,
+          "maxTokens": 4096,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        }
       ]
     }
   }
