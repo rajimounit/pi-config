@@ -7,7 +7,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda-12.6/targets/x86_64-linux/lib:/usr/lib/ws
 
 LM="/mnt/c/LM Studio/models"
 PORT=8081
-CTX=65536
+CTX=98304
 
 case "${1:-30b}" in
   30b)
