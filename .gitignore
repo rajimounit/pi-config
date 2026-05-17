@@ -1,0 +1,8 @@
+agent/auth.json
+agent/sessions/
+agent/bin/
+agent/mcp-cache.json
+agent/run-history.jsonl
+*.bak
+*.log
+.env

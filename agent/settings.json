@@ -1,0 +1,21 @@
+{
+  "defaultProvider": "ollama",
+  "defaultModel": "qwen3.6:35b-a3b",
+  "defaultThinkingLevel": "none",
+  "lastChangelogVersion": "0.74.0",
+  "packages": [
+    "npm:pi-memory",
+    "npm:pi-subagents",
+    "npm:@plannotator/pi-extension",
+    "npm:@ollama/pi-web-search",
+    "npm:pi-mcp-adapter"
+  ],
+  "autoCompaction": true,
+  "compactionThreshold": 0.80,
+  "favorites": [
+    "ollama/qwen3.6:35b-a3b",
+    "ollama/qwen3-coder:latest",
+    "ollama/qwen2.5-coder:7b",
+    "ollama/deepseek-r1:32b"
+  ]
+}

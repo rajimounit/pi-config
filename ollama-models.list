@@ -1,0 +1,12 @@
+qwen2.5-coder:7b
+bge-m3:latest
+qwen3-vl:8b
+qwen3.6-27b-q5:latest
+devstral-small-2:latest
+qwen3-embedding:latest
+deepseek-r1:32b
+qwen3:30b
+gemma4:31b
+gemma4:26b
+qwen3-coder:latest
+qwen3.6:35b-a3b
