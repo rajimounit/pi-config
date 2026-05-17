@@ -1,6 +1,6 @@
 {
-  "defaultProvider": "ollama",
-  "defaultModel": "ollama/pi-qwen3-35b",
+  "defaultProvider": "llama-cpp",
+  "defaultModel": "qwen3-coder:latest",
   "defaultThinkingLevel": "none",
   "lastChangelogVersion": "0.74.0",
   "packages": [
@@ -8,10 +8,12 @@
     "npm:pi-subagents",
     "npm:@plannotator/pi-extension",
     "npm:@ollama/pi-web-search",
-    "npm:pi-mcp-adapter",
     "npm:lsp-pi",
     "git:github.com/badlogic/pi-skills",
-    "https://github.com/davebcn87/pi-autoresearch"
+    "https://github.com/davebcn87/pi-autoresearch",
+    "npm:pi-tidy-mcp-adapter",
+    "npm:pi-lean-ctx",
+    "npm:@db0-ai/pi"
   ],
   "autoCompaction": true,
   "compactionThreshold": 0.8,

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi Agent — Extensions & Skills</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg2:#161616;--bg3:#1e1e1e;--bg4:#252525;
+  --border:#2a2a2a;--border2:#333;
+  --text:#e8e8e8;--text2:#a0a0a0;--text3:#666;
+  --teal:#00d79b;--teal-dim:#0f6e56;--teal-bg:#0a1f17;
+  --blue:#4da6ff;--blue-dim:#185fa5;--blue-bg:#0a1525;
+  --amber:#f5a623;--amber-bg:#1f1508;
+  --purple:#a78bfa;--purple-bg:#160f2a;
+  --red:#f87171;--red-bg:#1f0a0a;
+  --green:#4ade80;--green-bg:#0a1f0f;
+  --pink:#f472b6;--pink-bg:#1f0a18;
+  --radius:8px;--radius-sm:5px;
+  --mono:'JetBrains Mono',monospace;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+.app{max-width:980px;margin:0 auto;padding:2rem 1.5rem}
+
+/* Header */
+.header{margin-bottom:2rem}
+.header-top{display:flex;align-items:center;gap:12px;margin-bottom:.4rem}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff}
+.title{font-size:20px;font-weight:600;color:var(--text)}
+.subtitle{font-size:12px;color:var(--text3);margin-left:44px}
+.header-badges{display:flex;gap:8px;margin-top:.75rem;margin-left:44px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;border:0.5px solid}
+.badge-green{background:var(--green-bg);color:var(--green);border-color:#1a4d2a}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border-color:#1a3a5c}
+.badge-purple{background:var(--purple-bg);color:var(--purple);border-color:#2d1f5c}
+.badge-teal{background:var(--teal-bg);color:var(--teal);border-color:#0f3d2a}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border-color:#4d3010}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:3px;margin-bottom:1.5rem;overflow-x:auto}
+.tab{flex:1;min-width:90px;padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:transparent;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--text);background:var(--bg3)}
+.tab.active{background:var(--bg4);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tab i{font-size:13px}
+
+.panel{display:none}
+.panel.active{display:block}
+
+/* Section */
+.section{margin-bottom:2rem}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+/* Item row (main list item) */
+.item{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:.6rem;overflow:hidden;transition:border-color .15s}
+.item:hover{border-color:var(--border2)}
+.item-header{display:flex;align-items:center;gap:10px;padding:.85rem 1.1rem;cursor:pointer}
+.item-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.item-main{flex:1;min-width:0}
+.item-name{font-size:13px;font-weight:500;color:var(--text)}
+.item-pkg{font-size:11px;font-family:var(--mono);color:var(--text3);margin-top:1px}
+.item-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.item-body{padding:0 1.1rem .9rem;border-top:0.5px solid var(--border);display:none}
+.item-body.open{display:block}
+.item-body p{font-size:12px;color:var(--text2);line-height:1.7;padding-top:.7rem}
+
+/* Tags */
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600;margin:0 2px}
+.tag-installed{background:var(--green-bg);color:var(--green)}
+.tag-recommended{background:var(--teal-bg);color:var(--teal)}
+.tag-trending{background:var(--purple-bg);color:var(--purple)}
+.tag-optional{background:var(--bg4);color:var(--text3)}
+.tag-new{background:var(--pink-bg);color:var(--pink)}
+.tag-mcp{background:var(--blue-bg);color:var(--blue)}
+.tag-local{background:var(--amber-bg);color:var(--amber)}
+
+.chevron{color:var(--text3);font-size:13px;transition:transform .2s;flex-shrink:0}
+.chevron.open{transform:rotate(180deg)}
+
+/* Code */
+.code{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:.6rem .9rem;font-family:var(--mono);font-size:11px;color:var(--teal);margin:.5rem 0;overflow-x:auto;line-height:1.8}
+.cc{color:var(--text3)}
+code{font-family:var(--mono);font-size:11px;background:var(--bg4);border:0.5px solid var(--border);border-radius:3px;padding:1px 5px;color:var(--teal)}
+kbd{display:inline-block;background:var(--bg4);border:0.5px solid var(--border2);border-radius:3px;padding:1px 6px;font-family:var(--mono);font-size:11px;color:var(--text)}
+
+/* Pill */
+.pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin:2px;font-weight:500;border:0.5px solid}
+.pill-teal{background:var(--teal-bg);color:var(--teal);border-color:#0f3d2a}
+.pill-blue{background:var(--blue-bg);color:var(--blue);border-color:#1a3a5c}
+.pill-purple{background:var(--purple-bg);color:var(--purple);border-color:#2d1f5c}
+.pill-amber{background:var(--amber-bg);color:var(--amber);border-color:#4d3010}
+.pill-green{background:var(--green-bg);color:var(--green);border-color:#1a4d2a}
+.pill-pink{background:var(--pink-bg);color:var(--pink);border-color:#4d1a35}
+
+/* Grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:620px){.grid2{grid-template-columns:1fr}}
+
+/* Stat card */
+.stat{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:.9rem 1.1rem}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem}
+.stat-value{font-size:22px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Reco card */
+.reco{display:flex;gap:12px;align-items:flex-start;padding:.85rem 1.1rem;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:.6rem}
+.reco-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.reco-body{flex:1}
+.reco-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:.2rem}
+.reco-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* Divider */
+.divider{height:0.5px;background:var(--border);margin:.6rem 0}
+
+/* Note box */
+.note{font-size:11px;padding:.5rem .75rem;border-radius:var(--radius-sm);border:0.5px solid;display:flex;align-items:flex-start;gap:7px;margin:.5rem 0}
+.note-amber{color:var(--amber);background:var(--amber-bg);border-color:#4d3010}
+.note-teal{color:var(--teal);background:var(--teal-bg);border-color:#0f3d2a}
+.note-blue{color:var(--blue);background:var(--blue-bg);border-color:#1a3a5c}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo"><i class="ti ti-puzzle" style="font-size:15px"></i></div>
+      <div class="title">Pi Agent — Extensions & Skills</div>
+    </div>
+    <div class="subtitle">Écosystème complet · Tendances 2026 · Setup Neo (RTX 3090 · WSL Ubuntu · AVV Assist Pro)</div>
+    <div class="header-badges">
+      <span class="badge badge-green"><i class="ti ti-check"></i> 8 extensions installées</span>
+      <span class="badge badge-purple"><i class="ti ti-sparkles"></i> 17 skills actifs</span>
+      <span class="badge badge-blue"><i class="ti ti-server"></i> 5 MCP recommandés</span>
+      <span class="badge badge-teal"><i class="ti ti-trending-up"></i> Veille Mai 2026</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview')"><i class="ti ti-layout-dashboard"></i>Vue d'ensemble</button>
+    <button class="tab" onclick="showTab('extensions')"><i class="ti ti-plug"></i>Extensions</button>
+    <button class="tab" onclick="showTab('skills')"><i class="ti ti-wand"></i>Skills</button>
+    <button class="tab" onclick="showTab('mcp')"><i class="ti ti-server"></i>MCP Servers</button>
+    <button class="tab" onclick="showTab('recos')"><i class="ti ti-star"></i>Recommandations</button>
+  </div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <div id="panel-overview" class="panel active">
+
+    <div class="section">
+      <div class="section-label">Tableau de bord</div>
+      <div class="grid2">
+        <div class="stat"><div class="stat-label">Extensions npm/git</div><div class="stat-value">8</div><div class="stat-sub">installées · 12+ disponibles non installées</div></div>
+        <div class="stat"><div class="stat-label">Skills actifs</div><div class="stat-value">17</div><div class="stat-sub">badlogic(8) + autoresearch(3) + plannotator(6)</div></div>
+        <div class="stat"><div class="stat-label">Prompts slash</div><div class="stat-value">7</div><div class="stat-sub">/parallel-* · /gather-context · /review-loop</div></div>
+        <div class="stat"><div class="stat-label">Pi Agent version</div><div class="stat-value">0.74.0</div><div class="stat-sub">v0.74.1 disponible · org → earendil-works</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Extensions installées — résumé</div>
+      <div class="item">
+        <div class="item-header" style="cursor:default">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-plug" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main">
+            <div class="item-name">8 extensions actives</div>
+            <div class="item-pkg">lsp-pi · pi-subagents · pi-memory · pi-mcp-adapter · pi-autoresearch · badlogic/pi-skills · @ollama/pi-web-search · @plannotator/pi-extension</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Nouveauté Pi v0.74.0 — à connaître</div>
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--pink-bg)"><i class="ti ti-sparkles" style="color:var(--pink);font-size:14px"></i></div>
+          <div class="item-main">
+            <div class="item-name">Pi migre vers earendil-works</div>
+            <div class="item-pkg">Organisation GitHub + npm scope renommés</div>
+          </div>
+          <div class="item-right"><span class="tag tag-new">NEW</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Les packages npm passent sous le scope <code>@earendil-works</code> (ex: <code>@earendil-works/pi-coding-agent</code>). Les anciens packages <code>@mariozechner/pi-*</code> sont dépréciés mais toujours fonctionnels.</p>
+          <p style="margin-top:.4rem"><strong style="color:var(--text)">Autres nouveautés 0.74.x :</strong> support image generation, provider Together AI, JSONC dans models.json (commentaires autorisés), rendu markdown amélioré, binaires Windows ARM64.</p>
+          <div class="code"><span class="cc"># Vérifier la version et mettre à jour</span>
+pi --version
+pi update</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-file-code" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main">
+            <div class="item-name">JSONC supporté dans models.json</div>
+            <div class="item-pkg">~/.pi/agent/models.json</div>
+          </div>
+          <div class="item-right"><span class="tag tag-new">NEW</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Tu peux maintenant ajouter des commentaires et des virgules trailing dans <code>models.json</code>. Utile pour documenter chaque provider/modèle directement dans le fichier.</p>
+          <div class="code"><span class="cc">// ~/.pi/agent/models.json — maintenant supporté</span>
+{
+  "providers": [
+    // Backend Ollama — toujours actif
+    { "name": "ollama", ... },
+    // llama.cpp — démarrer ~/.pi/start-llama.sh d'abord
+    { "name": "llama-cpp", ... }, // port 8081
+  ]
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== EXTENSIONS ===== -->
+  <div id="panel-extensions" class="panel">
+
+    <div class="section">
+      <div class="section-label">Installées</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-code" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">lsp-pi</div><div class="item-pkg">npm:lsp-pi</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Live LSP diagnostics après chaque édition de fichier. Pi reçoit les erreurs TypeScript et Python automatiquement sans que tu lances de build.</p>
+          <p><strong style="color:var(--text)">Actif sur :</strong> TypeScript ✓ · Python ✓ · Go ✗ (désactivé)</p>
+          <p><strong style="color:var(--text)">Impact AVV Assist Pro :</strong> Très élevé — NestJS/TypeScript, erreurs de compilation retournées en temps réel.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-users" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-subagents</div><div class="item-pkg">npm:pi-subagents</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Délégation de tâches à des sous-agents parallèles via <code>/task</code>. Un agent principal orchestre plusieurs agents spécialisés simultanément.</p>
+          <p><strong style="color:var(--text)">Cas d'usage :</strong> Analyser le frontend et le backend en parallèle, lancer plusieurs recherches simultanées.</p>
+          <div class="code"><span class="cc"># Exemple : déléguer une analyse</span>
+/task "Analyser tous les endpoints NestJS du module AI"</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-brain" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-memory</div><div class="item-pkg">npm:pi-memory</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Mémoire persistante inter-sessions. Pi se souvient des préférences, corrections et contexte projet entre deux lancements.</p>
+          <div class="note note-amber"><i class="ti ti-alert-triangle"></i> Des alternatives plus récentes existent : <code>@samfp/pi-memory</code> (maj il y a 11h) et <code>@db0-ai/pi</code> (SQLite, extraction automatique de faits). Voir onglet Recommandations.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--bg4)"><i class="ti ti-plug-connected" style="color:var(--text2);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-mcp-adapter</div><div class="item-pkg">npm:pi-mcp-adapter</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Adaptateur MCP (Model Context Protocol) — permet à Pi de se connecter à des serveurs MCP externes. Bridge entre Pi Agent et l'écosystème MCP.</p>
+          <div class="note note-amber"><i class="ti ti-alert-triangle"></i> <code>pi-tidy-mcp-adapter</code> (v2.6.1) est un fork maintenu plus actif. Voir Recommandations.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-search" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-autoresearch</div><div class="item-pkg">git:davebcn87/pi-autoresearch</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Boucle autonome benchmark : edit → score → commit si amélioration / revert si régression. Requiert un script <code>checks.sh</code> dans le repo.</p>
+          <p><strong style="color:var(--text)">Skills exposés :</strong> <code>autoresearch-create</code> <code>autoresearch-finalize</code> <code>autoresearch-hooks</code></p>
+          <p><strong style="color:var(--text)">Prérequis pour l'activer sur AVV Assist Pro :</strong> créer <code>checks.sh</code> + définir une métrique de score. Voir Palier D.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-puzzle" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">badlogic/pi-skills</div><div class="item-pkg">git:github.com/badlogic/pi-skills</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Pack de 8 skills communautaires. Maintenu activement par Mario Zechner (earendil-works).</p>
+          <div style="margin-top:.4rem">
+            <span class="pill pill-blue">brave-search</span><span class="pill pill-blue">browser-tools</span><span class="pill pill-blue">youtube-transcript</span><span class="pill pill-blue">transcribe</span><span class="pill pill-blue">gccli</span><span class="pill pill-blue">gdcli</span><span class="pill pill-blue">gmcli</span><span class="pill pill-blue">vscode</span>
+          </div>
+          <div class="code"><span class="cc"># Mettre à jour</span>
+pi update git:github.com/badlogic/pi-skills</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--amber-bg)"><i class="ti ti-world-search" style="color:var(--amber);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">@ollama/pi-web-search</div><div class="item-pkg">npm:@ollama/pi-web-search</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Recherche web via Ollama. Complément à brave-search de badlogic/pi-skills.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-list-details" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">@plannotator/pi-extension</div><div class="item-pkg">npm:@plannotator/pi-extension</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Installé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Extension de planification et annotation. Expose les skills plannotator : <code>plannotator-annotate</code> <code>plannotator-compound</code> <code>plannotator-review</code> <code>plannotator-setup-goal</code> <code>plannotator-visual-explainer</code></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Disponibles — non installées · à considérer</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-filter" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-lean-ctx</div><div class="item-pkg">npm:pi-lean-ctx</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Optimisation des tokens via routage intelligent des commandes : bash, read, grep, find, ls sont routés pour minimiser la consommation de contexte. Particulièrement utile avec Ollama/llama.cpp local où chaque token compte.</p>
+          <p><strong style="color:var(--text)">Impact :</strong> Réduit la consommation de contexte sur des tâches répétitives. Idéal en complément du 65k context llama.cpp.</p>
+          <div class="code">pi install npm:pi-lean-ctx</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-plug-connected" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-tidy-mcp-adapter</div><div class="item-pkg">npm:pi-tidy-mcp-adapter · v2.6.1</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Fork maintenu de pi-mcp-adapter avec des corrections et améliorations. Meilleure stabilité pour la connexion aux serveurs MCP.</p>
+          <div class="code">pi install npm:pi-tidy-mcp-adapter
+<span class="cc"># Puis supprimer l'ancien :</span>
+pi uninstall npm:pi-mcp-adapter</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-database" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">@db0-ai/pi</div><div class="item-pkg">npm:@db0-ai/pi · SQLite · zero-config</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Mémoire persistante SQLite avec extraction automatique de faits. Zero-config. Alternative plus robuste à pi-memory pour retenir les préférences, patterns de code, décisions d'architecture d'AVV Assist Pro.</p>
+          <div class="code">pi install npm:@db0-ai/pi</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-sparkles" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">Superpowers</div><div class="item-pkg">git:github.com/superpowers-ai/superpowers · 124k ⭐</div></div>
+          <div class="item-right"><span class="tag tag-trending">🔥 Trending</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Framework multi-agent le plus complet pour dev workflow. TDD enforced (Pi ne peut pas écrire l'implémentation avant un test qui échoue), spec-first design, code review structuré, subagent execution, planning. Compatible Pi, Claude Code, Cursor, Codex.</p>
+          <p><strong style="color:var(--text)">Impact AVV Assist Pro :</strong> Très élevé — qualité de code, TDD, architecture reviews sur le module IA.</p>
+          <div class="code">pi install git:github.com/superpowers-ai/superpowers</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--pink-bg)"><i class="ti ti-list" style="color:var(--pink);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">awesome-pi-agent</div><div class="item-pkg">github.com/qualisero/awesome-pi-agent · liste curated</div></div>
+          <div class="item-right"><span class="tag tag-trending">🔥 Trending</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Liste communautaire maintenue des extensions Pi Agent. Source de veille primaire. Ajouts récents : pi-aliyun, pi-elixir, pi-secret-guard.</p>
+          <div class="note note-teal"><i class="ti ti-eye"></i> À consulter régulièrement pour découvrir de nouvelles extensions.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--bg4)"><i class="ti ti-terminal" style="color:var(--text2);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">pi-interactive-shell</div><div class="item-pkg">npm:pi-interactive-shell</div></div>
+          <div class="item-right"><span class="tag tag-optional">Optionnel</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Shell interactif enrichi pour Pi. Utile pour des workflows nécessitant des interactions shell complexes au sein d'une session Pi.</p>
+          <div class="code">pi install npm:pi-interactive-shell</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SKILLS ===== -->
+  <div id="panel-skills" class="panel">
+
+    <div class="section">
+      <div class="section-label">Skills installés · badlogic/pi-skills</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-search" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">brave-search</div><div class="item-pkg">Recherche web locale via Brave</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Recherche web sans scraping navigateur. Résultats rapides et pertinents. Idéal pour de la veille technologique, docs, Stack Overflow, GitHub issues directement depuis Pi.</p>
+          <p><strong style="color:var(--text)">Usage :</strong> Demander à Pi de rechercher sur le web — il utilisera brave-search automatiquement.</p>
+          <div class="note note-amber"><i class="ti ti-alert-triangle"></i> Requiert une clé API Brave Search. Vérifier la configuration dans badlogic/pi-skills.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-browser" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">browser-tools</div><div class="item-pkg">Automatisation navigateur</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Interaction avec le navigateur : lire des pages, extraire du contenu, naviguer. Complément à brave-search pour les pages nécessitant du JavaScript.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-video" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">youtube-transcript + transcribe</div><div class="item-pkg">Extraction de transcriptions</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p><code>youtube-transcript</code> extrait la transcription d'une vidéo YouTube via son URL. <code>transcribe</code> transcrit un fichier audio local.</p>
+          <p><strong style="color:var(--text)">Usage veille :</strong> Donner une URL de conférence technique à Pi pour en extraire les points clés sans regarder la vidéo.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--amber-bg)"><i class="ti ti-terminal-2" style="color:var(--amber);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">gccli · gdcli · gmcli</div><div class="item-pkg">Git CLI tools</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Outils Git enrichis accessibles depuis Pi : <code>gccli</code> (git commit assistant), <code>gdcli</code> (git diff viewer), <code>gmcli</code> (git merge assistant). Pi peut générer des messages de commit conventionnels automatiquement.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--bg4)"><i class="ti ti-brand-vscode" style="color:var(--text2);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">vscode</div><div class="item-pkg">Intégration VS Code</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Pi peut interagir avec VS Code : ouvrir des fichiers, naviguer dans l'éditeur, lire la sélection courante.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Skills installés · pi-autoresearch</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-refresh" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">autoresearch-create / finalize / hooks</div><div class="item-pkg">Boucle benchmark autonome</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Workflow en 3 phases : <code>autoresearch-create</code> initialise un benchmark, <code>autoresearch-hooks</code> intercepte les modifications, <code>autoresearch-finalize</code> valide et commit si le score s'améliore.</p>
+          <p><strong style="color:var(--text)">Prérequis :</strong> fichier <code>checks.sh</code> + métrique de score définie dans le repo. Non encore activé sur AVV Assist Pro.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Skills installés · @plannotator/pi-extension</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-clipboard-list" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">plannotator-* (6 skills)</div><div class="item-pkg">Planification, annotation, revue</div></div>
+          <div class="item-right"><span class="tag tag-installed">✓ Actif</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Suite de skills de planification : <code>plannotator-setup-goal</code> (définit l'objectif), <code>plannotator-annotate</code> (annote le code), <code>plannotator-review</code> (revue de plan), <code>plannotator-compound</code> (tâches composées), <code>plannotator-last</code> (récupère le dernier plan), <code>plannotator-visual-explainer</code> (explication visuelle).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Prompts slash disponibles</div>
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-command" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">7 prompts slash actifs</div><div class="item-pkg">/parallel-* · /gather-context · /review-loop</div></div>
+          <div class="item-right"><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Prompts disponibles directement avec <code>/</code> dans Pi :</p>
+          <div style="margin-top:.5rem">
+            <div style="margin-bottom:.4rem"><code>/gather-context-and-clarify</code> — Collecte le contexte du projet et clarifie l'objectif avant toute tâche longue.</div>
+            <div style="margin-bottom:.4rem"><code>/parallel-context-build</code> — Construit le contexte en parallèle sur plusieurs fichiers/modules.</div>
+            <div style="margin-bottom:.4rem"><code>/parallel-research</code> — Lance plusieurs recherches simultanées via sous-agents.</div>
+            <div style="margin-bottom:.4rem"><code>/parallel-review</code> — Revue de code en parallèle sur plusieurs fichiers.</div>
+            <div style="margin-bottom:.4rem"><code>/parallel-handoff-plan</code> — Prépare un plan de handoff entre agents.</div>
+            <div style="margin-bottom:.4rem"><code>/parallel-cleanup</code> — Nettoyage de code en parallèle.</div>
+            <div><code>/review-loop</code> — Boucle de revue itérative jusqu'à satisfaction d'un critère.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Skills non installés · haute valeur</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-test-pipe" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">TDD Skill (Superpowers)</div><div class="item-pkg">git:github.com/superpowers-ai/superpowers</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Enforce le cycle red-green-refactor : Pi <strong style="color:var(--red)">ne peut pas</strong> écrire l'implémentation tant qu'il n'y a pas un test qui échoue. Drastiquement améliore la qualité du code généré sur AVV Assist Pro.</p>
+          <div class="code">pi install git:github.com/superpowers-ai/superpowers</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-books" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">awesome-claude-skills</div><div class="item-pkg">github.com/karanb192/awesome-claude-skills · 50+ skills</div></div>
+          <div class="item-right"><span class="tag tag-trending">🔥 Trending</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Collection de 50+ skills vérifiés : TDD, debugging, git workflows, document processing. Compatible Pi Agent, Claude Code, API. Source de skills individuels à intégrer dans AGENTS.md ou comme extensions.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== MCP SERVERS ===== -->
+  <div id="panel-mcp" class="panel">
+
+    <div class="section">
+      <div class="section-label">C'est quoi un MCP Server ?</div>
+      <div class="item">
+        <div class="item-header" style="cursor:default">
+          <div class="item-icon" style="background:var(--blue-bg)"><i class="ti ti-info-circle" style="color:var(--blue);font-size:14px"></i></div>
+          <div class="item-main">
+            <div class="item-name">Model Context Protocol — standard ouvert Anthropic</div>
+            <div class="item-pkg">Pi se connecte via pi-mcp-adapter · pi-tidy-mcp-adapter</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin:.5rem 0 1rem;line-height:1.7">Un MCP Server expose des <strong style="color:var(--text)">outils</strong> que Pi peut appeler comme des fonctions : lire des tickets Jira, pousser sur GitHub, lancer des tests Playwright, interroger une base de données. C'est l'équivalent des plugins pour agents IA.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Priorité haute — installation recommandée</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--bg4)"><i class="ti ti-brand-github" style="color:var(--text);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">GitHub MCP</div><div class="item-pkg">@modelcontextprotocol/server-github</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ #1 Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Le MCP le plus utilisé pour les devs. Pi peut créer/lire des issues, ouvrir des PRs, lire le CI, faire des reviews de code directement depuis la session. Intégration complète avec <code>rajimounit/pi-config</code> et le repo AVV Assist Pro.</p>
+          <div class="code"><span class="cc"># Installation via pi-tidy-mcp-adapter :</span>
+pi install npm:pi-tidy-mcp-adapter
+<span class="cc"># Config dans ~/.pi/agent/mcp-servers.json :</span>
+{ "github": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"], "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "..." } } }</div>
+          <div class="note note-amber"><i class="ti ti-alert-triangle"></i> Requiert un Personal Access Token GitHub. Stocker dans <code>~/.pi/.env</code> (gitignored).</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--green-bg)"><i class="ti ti-test-pipe" style="color:var(--green);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">Playwright MCP</div><div class="item-pkg">@playwright/mcp</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Pi peut lancer des tests e2e Playwright, naviguer dans le navigateur, prendre des screenshots, interagir avec les formulaires. Direct pour tester la SPA AVV Assist Pro.</p>
+          <div class="code">npx playwright install chromium
+<span class="cc"># Config MCP :</span>
+{ "playwright": { "command": "npx", "args": ["@playwright/mcp"] } }</div>
+          <p style="margin-top:.4rem"><strong style="color:var(--text)">Cas d'usage AVV Assist Pro :</strong> Pi ouvre le front, navigue, vérifie que le wizard de qualification fonctionne, screenshot si erreur.</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--amber-bg)"><i class="ti ti-world" style="color:var(--amber);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">Local Research MCP</div><div class="item-pkg">DuckDuckGo-based · 100% local · sans clé API</div></div>
+          <div class="item-right"><span class="tag tag-local">100% Local</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Recherche web via DuckDuckGo, zéro clé API, zéro données envoyées à un tiers. Aligné avec la philosophie 100% local. Alternative/complément à brave-search pour la veille.</p>
+          <div class="code">pi install git:github.com/Unlock-MCP/local-research-server</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-database" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">PostgreSQL MCP</div><div class="item-pkg">@modelcontextprotocol/server-postgres</div></div>
+          <div class="item-right"><span class="tag tag-recommended">★ Recommandé</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Pi peut interroger directement la base PostgreSQL d'AVV Assist Pro (<code>avv-postgres-v3</code>). Lire le schéma, exécuter des queries, vérifier les données sans passer par l'API NestJS.</p>
+          <div class="code">{ "postgres": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/avv_assist"] } }</div>
+          <div class="note note-blue"><i class="ti ti-info-circle"></i> Idéal pour debug : Pi peut vérifier directement si les données sont bien en base après une opération.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--purple-bg)"><i class="ti ti-code" style="color:var(--purple);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">NestJS MCP Server</div><div class="item-pkg">@nestjs-mcp/server · intégration dans AVV Assist Pro</div></div>
+          <div class="item-right"><span class="tag tag-trending">🔥 Trending</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Module NestJS pour exposer ton API comme un serveur MCP. Pi pourrait appeler les endpoints d'AVV Assist Pro comme des outils natifs — créer un dossier, lancer une extraction mail, voir le statut d'une opportunité.</p>
+          <p><strong style="color:var(--text)">Concept :</strong> AVV Assist Pro devient un MCP Server → Pi Agent peut l'orchestrer directement.</p>
+          <div class="code"><span class="cc"># Dans le backend NestJS :</span>
+npm install @nestjs-mcp/server
+<span class="cc"># Décorer les services avec @Tool()</span></div>
+          <div class="note note-blue"><i class="ti ti-info-circle"></i> C'est le Palier D le plus ambitieux — transformation d'AVV Assist Pro en outil natif Pi.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">À surveiller · priorité secondaire</div>
+
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--bg4)"><i class="ti ti-search" style="color:var(--text2);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">Claude Context MCP (zilliztech)</div><div class="item-pkg">Recherche sémantique dans la codebase</div></div>
+          <div class="item-right"><span class="tag tag-optional">À évaluer</span><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <p>Recherche sémantique sur l'ensemble du codebase. Complémentaire à bge-m3 (déjà disponible sur /mnt/c). Permet à Pi de trouver des patterns similaires dans tout le code, pas juste par grep.</p>
+          <p><strong style="color:var(--text)">Note :</strong> bge-m3-Q8_0 est déjà disponible localement — il faudrait d'abord explorer une intégration directe avant d'ajouter un MCP externe.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== RECOMMANDATIONS ===== -->
+  <div id="panel-recos" class="panel">
+
+    <div class="section">
+      <div class="section-label">Plan d'action priorisé</div>
+
+      <div class="reco">
+        <div class="reco-num" style="background:var(--teal-bg);color:var(--teal)">1</div>
+        <div class="reco-body">
+          <div class="reco-title">Installer pi-tidy-mcp-adapter + GitHub MCP</div>
+          <div class="reco-desc">Remplace pi-mcp-adapter par sa version maintenue (v2.6.1), puis connecte GitHub. Pi pourra créer des issues, lire le CI, ouvrir des PRs directement depuis la session — sans quitter le terminal.</div>
+          <div class="code" style="margin-top:.5rem">pi install npm:pi-tidy-mcp-adapter
+pi uninstall npm:pi-mcp-adapter</div>
+        </div>
+      </div>
+
+      <div class="reco">
+        <div class="reco-num" style="background:var(--blue-bg);color:var(--blue)">2</div>
+        <div class="reco-body">
+          <div class="reco-title">Installer Superpowers (TDD + Code Review)</div>
+          <div class="reco-desc">124k étoiles GitHub. Enforce TDD sur AVV Assist Pro : Pi ne peut pas implémenter sans un test qui échoue d'abord. Ajoute aussi des revues de code structurées et du planning spec-first. Impact direct sur la qualité du code généré.</div>
+          <div class="code" style="margin-top:.5rem">pi install git:github.com/superpowers-ai/superpowers</div>
+        </div>
+      </div>
+
+      <div class="reco">
+        <div class="reco-num" style="background:var(--purple-bg);color:var(--purple)">3</div>
+        <div class="reco-body">
+          <div class="reco-title">Installer Playwright MCP pour tester la SPA AVV Assist Pro</div>
+          <div class="reco-desc">Pi pourra naviguer dans l'interface, tester des workflows, prendre des screenshots en cas d'erreur — sans que tu lances les tests manuellement. Particulièrement utile pour le module wizard et le dossier tracker.</div>
+          <div class="code" style="margin-top:.5rem">npx playwright install chromium</div>
+        </div>
+      </div>
+
+      <div class="reco">
+        <div class="reco-num" style="background:var(--amber-bg);color:var(--amber)">4</div>
+        <div class="reco-body">
+          <div class="reco-title">Installer pi-lean-ctx pour économiser les tokens</div>
+          <div class="reco-desc">Route les commandes bash/grep/find/ls de façon optimisée. Utile sur des sessions longues avec llama.cpp — réduit la consommation de contexte sur les tâches répétitives de lecture de fichiers.</div>
+          <div class="code" style="margin-top:.5rem">pi install npm:pi-lean-ctx</div>
+        </div>
+      </div>
+
+      <div class="reco">
+        <div class="reco-num" style="background:var(--green-bg);color:var(--green)">5</div>
+        <div class="reco-body">
+          <div class="reco-title">Ajouter PostgreSQL MCP pour debug direct sur la DB</div>
+          <div class="reco-desc">Pi pourra vérifier les données d'AVV Assist Pro directement dans PostgreSQL. Utile pour débugger les opérations de dossier, vérifier les migrations TypeORM, inspecter les données après une extraction mail IA.</div>
+        </div>
+      </div>
+
+      <div class="reco">
+        <div class="reco-num" style="background:var(--bg4);color:var(--text2)">6</div>
+        <div class="reco-body">
+          <div class="reco-title">Veille mensuelle — awesome-pi-agent</div>
+          <div class="reco-desc">Consulter <code>github.com/qualisero/awesome-pi-agent</code> chaque mois pour découvrir les nouvelles extensions. Demander à Pi de faire ce tour de veille et résumer les ajouts pertinents pour ton stack.</div>
+          <div class="code" style="margin-top:.5rem"><span class="cc"># Demander à Pi :</span>
+"Fais une veille sur github.com/qualisero/awesome-pi-agent
+et résume les nouveautés pertinentes pour un setup
+NestJS + Ollama + llama.cpp"</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section">
+      <div class="section-label">Commandes d'installation groupées</div>
+      <div class="item">
+        <div class="item-header" onclick="toggleItem(this)">
+          <div class="item-icon" style="background:var(--teal-bg)"><i class="ti ti-copy" style="color:var(--teal);font-size:14px"></i></div>
+          <div class="item-main"><div class="item-name">Prompt Pi — installer tout le batch recommandé</div></div>
+          <div class="item-right"><i class="ti ti-chevron-down chevron"></i></div>
+        </div>
+        <div class="item-body">
+          <div class="code">Install recommended extensions batch:
+
+1. pi install npm:pi-tidy-mcp-adapter
+2. pi uninstall npm:pi-mcp-adapter
+3. pi install npm:pi-lean-ctx
+4. pi install git:github.com/superpowers-ai/superpowers
+
+After each install, verify with: pi list
+
+Then commit:
+  cd ~/.pi
+  git add -A
+  git commit -m "feat: recommended extensions batch (tidy-mcp, lean-ctx, superpowers)"
+  git push
+
+Report: each install success/fail, git commit hash.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+function toggleItem(header){
+  const body=header.nextElementSibling;
+  const chev=header.querySelector('.chevron');
+  if(body){body.classList.toggle('open');if(chev)chev.classList.toggle('open');}
+}
+</script>
+</body>
+</html>
