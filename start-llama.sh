@@ -39,4 +39,6 @@ exec ~/llama.cpp/build/bin/llama-server \
   --host 127.0.0.1 \
   --port $PORT \
   --ctx-size $CTX \
-  --n-gpu-layers 99
+  --n-gpu-layers 99 \
+  --cache-type-k q8_0 \
+  --cache-type-v q8_0
