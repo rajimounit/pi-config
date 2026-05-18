@@ -1,52 +1,201 @@
-# Agent Instructions — Pi Agent Local
+# AGENTS - Prompt socle commun (AVV Assist Pro)
 
-## Backend et contraintes d'inference
-- Provider principal : Ollama sur http://localhost:11434/v1
-- Provider alternatif : llama-cpp sur http://127.0.0.1:8081/v1 (si demarre)
-- Modele par defaut : qwen3.6:35b-a3b
-- Limite contexte effective : traiter 24k tokens comme limite sure
-- Quand le contexte depasse 70%, ecrire un TODO.md resumant le travail restant avant compaction
+Ce fichier est le socle commun pour tous les agents IA du projet.
+Chaque agent applique ce socle puis son prompt de rôle.
 
-## Style de travail
-- Toujours lire un fichier avant de le modifier — ne jamais supposer sa structure
-- Verifier les changements : lancer le test, linter ou build concerne apres chaque edition
-- Pour les taches > 6 tours, ecrire un plan TASK.md et le suivre
-- Preferer les editions chirurgicales aux reecritures completes
-- Les operations destructives (delete, drop, rm -rf) necessitent un commentaire de confirmation explicite avant execution
+## 0) Mode Autopilot (par défaut)
+Quand l'utilisateur décrit seulement une évolution métier/technique, l'agent doit:
+- détecter automatiquement le type de tâche,
+- choisir le rôle et la séquence d'orchestration adaptés,
+- détecter les fichiers impactés probables,
+- exécuter les checks pertinents,
+- livrer le résultat sans demander de format supplémentaire.
 
-## Qualite de code par defaut
-- Python : type hints, pas de except nu, f-strings
-- TypeScript/JavaScript : strict mode, types de retour explicites sur les exports
-- Docker : toujours HEALTHCHECK, tags d'image epingles
-- Shell : set -euo pipefail en tete de chaque script
+Routage automatique attendu:
+- Demande de review explicite -> mode REVIEW.
+- Demande documentation explicite -> mode DOCS.
+- Demande catalogue/ingestion/data explicite -> mode DATA (+ validation QA ciblée).
+- Demande de fix/feature/refactor locale -> mode DEV -> REVIEW -> DEV fix -> QA.
+- Si comportement utilisateur/API/workflow change -> ajouter DOCS en fin de séquence.
 
-## Git
-- Toujours verifier git status avant de commencer
-- Creer une branche dediee pour toute fonctionnalite ou fix non trivial
-- Format de commit : type(scope): description courte
+Politique de clarification:
+- Poser une question uniquement si blocage réel (ambiguïté critique, choix métier irréversible, risque destructif).
+- Sinon faire l'hypothèse la plus sûre, l'implémenter, puis l'expliquer dans la restitution.
 
-## Quand s'arreter et demander
-S'arreter uniquement si :
-1. Un secret ou credential absent du repo est necessaire
-2. Une action destructive n'a pas de rollback clair
-3. La spec est genuinement ambigue (pas juste complexe)
+## 1) Périmètre produit
+- Produit: AVV Assist Pro (qualification avant-vente cloud/hybride).
+- Front: `avv_assist` (SPA HTML/CSS/JS) - dev server sur `http://localhost:8082`.
+- Backend: `backend` (NestJS) - API sur `http://localhost:3002`.
+- DB: PostgreSQL (conteneur historique `avv-postgres` ou `avv_postgres`).
 
-## Model Routing
+## 2) Base historique vérifiée (sources)
+Règles dérivées des interactions et livrables déjà produits, vérifiées dans:
+- `README.md`
+- `docs/RUNBOOK.md`
+- `docs/WORKFLOWS.md`
+- `docs/ADMIN_IA.md`
+- `docs/AI_LOCAL.md`
+- `docs/INGESTION.md`
+- `docs/SITE_MAP.md`
+- `docs/SERVICE_DEFINITIONS.md`
+- `docs/CLOUD_PROVIDER_REFERENCE.md`
+- `avv_assist/CHANGELOG.md`
+- `avv_assist/PHASE1_AUDIT_REPORT.md`
+- `avv_assist/PHASE2_TARGET_SOLUTION.md`
+- Historique git jusqu'au `2026-02-16` (`feat(ai)` + correctifs stack/dev/docs)
 
-Default: ollama/pi-qwen3-35b (fast start, most tasks)
+## 3) Décisions historiques à respecter
 
-Switch to llama-cpp when:
-- Session will exceed 30k tokens (large repo reads, full module analysis)
-- Task requires guaranteed 64k context (AVV Assist Pro full backend read)
-- Ollama silently truncates responses
+### 3.1 Architecture et flux
+- Le front reste une SPA sans framework build (pas de React/Vite ajoutés sans demande explicite).
+- Le backend est l'unique point d'accès IA (`/ai/chat`, `/ai/providers`, `/ai/health`).
+- Le state front persiste en localStorage et se synchronise au backend (`opportunities`) via `Store.syncToBackend`.
+- Toute évolution de schéma state doit garder la migration/rétrocompatibilité.
 
-Switch command: Ctrl+P then select llama-cpp/qwen3-coder:latest
-Start llama server first: ~/.pi/start-llama.sh
+### 3.2 Navigation et parcours métier
+- Le wizard est séquentiel: le verrouillage d'étape via validation ne doit pas être cassé.
+- Les routes cachées (`deliverables`, `excel_import`, `price_list_admin`, `user_guide`) ne doivent être exposées que volontairement.
+- La visibilité des modules dépend du scénario (cloud_only/hybrid/colocation/dedicated_cloud).
 
-Switch to pi-qwen25-coder-7b when:
-- Quick lookup, grep, single file read
-- VRAM is constrained (other processes running)
+### 3.3 IA V1.1
+- Profils IA backend-only (aucune clé API côté front).
+- Routage par usage (`review`, `excel`) avec fallback.
+- Validation humaine obligatoire du rendu IA avant injection (sauf demande explicite contraire).
+- Les providers legacy peuvent être visibles mais non utilisés en production V1.
 
-Switch to deepseek-r1:32b when:
-- Architecture decision needed
-- Non-trivial debugging requiring structured reasoning
+### 3.4 Livrables
+- Cohérence attendue entre HTML, PDF, PPTX, email interne.
+- Toute correction de calcul/format doit être propagée aux canaux concernés.
+- Ne pas introduire d'écart de contenu entre "Restitution" et livrables exportés.
+
+### 3.5 Données et catalogue
+- Pipeline ingestion traçable: source -> parsing -> normalisation -> validation schéma.
+- Déduplication par code service et conservation des références de provenance.
+- Toute ambiguïté métier du catalogue doit être marquée pour revue humaine.
+
+## 4) Règles d'implémentation
+- Changement minimal et ciblé.
+- Préserver conventions existantes (naming, structure, API).
+- Éviter les refactors larges hors scope.
+- Ajouter un commentaire uniquement si la logique est non évidente.
+- Ne jamais inventer un résultat de test non exécuté.
+- Pour les correctifs CSS purs (aucun JS ni backend modifié): pas de restart Docker nécessaire. Le hot-reload front suffit. Checks requis: `npm run lint` (dans `avv_assist`) + `bash scripts/smoke-front.sh` uniquement.
+
+## 5) Validation minimale attendue
+Exécuter uniquement les checks pertinents selon la zone modifiée.
+
+Backend (`backend`):
+- `npm run lint:check`
+- `npm test`
+- `npm run build`
+
+Front (`avv_assist`):
+- `npm run lint`
+- `npm test`
+
+Impacts stack/dev/IA:
+- `bash scripts/dev.sh`
+- `curl -sS http://localhost:3002/ai/providers`
+- `curl -sS http://localhost:3002/ai/health`
+- `bash scripts/smoke-back.sh`
+- `bash scripts/smoke-front.sh`
+
+## 6) Zones sensibles (revue renforcée)
+Ces fichiers ont été souvent modifiés et demandent une vigilance accrue:
+- `avv_assist/index.html`
+- `avv_assist/js/core/version.js`
+- `avv_assist/js/core/store.js`
+- `avv_assist/js/core/router.js`
+- `avv_assist/css/base.css`
+- `avv_assist/css/layout.css`
+- `avv_assist/js/modules/review.js`
+- `avv_assist/js/modules/excel_importer.js`
+- `avv_assist/js/modules/deliverables.js`
+- `avv_assist/js/utils/pdf_generator.js`
+- `avv_assist/js/utils/pptx_generator.js`
+- `scripts/dev.sh`
+- `docs/RUNBOOK.md`
+- `docs/WORKFLOWS.md`
+
+## 7) Definition of Done
+Un travail est "Done" si:
+- besoin fonctionnel couvert,
+- diff lisible et limité,
+- checks pertinents exécutés (ou limite clairement signalée),
+- risques/régressions explicités,
+- restitution finale avec fichiers touchés et impacts.
+
+## 8) Interdits
+- Exposer ou versionner des secrets.
+- Contourner le flux IA backend-only.
+- Casser la validation humaine avant injection IA sans demande explicite.
+- Changer des données métier de façon destructive sans instruction explicite.
+
+## 9) Format de restitution attendu
+- Résultat: ce qui a changé et pourquoi.
+- Vérifications: commandes exécutées + statut.
+- Risques/limites: ce qui reste ouvert.
+- Next steps: seulement si utile.
+
+## 10) Entrée minimale utilisateur (zéro friction)
+Entrée recommandée si tu veux ne rien piloter manuellement:
+- `Demande: <ce que tu veux obtenir>`
+- `Contrainte optionnelle: <deadline, techno imposée, scope interdit>`
+
+L'agent doit déduire le reste automatiquement depuis ce socle.
+
+## 11) Git workflow recommandé (petite feature/fix)
+Séquence standard à appliquer:
+1. `git switch develop` (s'assurer d'être sur la bonne base)
+   `git switch -c feat/<nom-court>` (ou `fix/<nom-court>`)
+2. Implémenter les changements.
+3. `git status --short`
+4. `git add <fichiers-liés>` (stager uniquement ce qui est lié à la demande)
+5. `git commit -m "<type(scope): message>"`
+6. `git push -u origin <branche>`
+7. Ouvrir une PR vers `develop`
+8. Après validation, merger dans `develop` puis supprimer la branche
+
+Attention: ne jamais pousser directement sur `main`.
+`main` est la branche de release stable et reçoit uniquement les merges validés depuis `develop`.
+
+Règles:
+- Une branche par sujet (pas de mélange de sujets dans un même commit).
+- Commit atomique et message explicite.
+- Pas de commit de fichiers temporaires/non liés.
+
+## 12) Versioning + anti-cache (règles simples)
+Quand un changement impacte le front livré (JS/CSS/HTML):
+1. Appliquer SemVer simple:
+- `patch`: correctif / amélioration interne sans rupture.
+- `minor`: nouvelle feature compatible.
+- `major`: rupture de compatibilité.
+2. Mettre à jour `avv_assist/js/core/version.js`:
+- `full`, `major`, `minor`, `patch` doivent rester cohérents.
+3. Mettre à jour le cache-busting dans `avv_assist/index.html`:
+- sur chaque asset JS/CSS **modifié** et référencé, mettre `?v=<Version.full>`.
+- tout nouveau fichier CSS ajouté dans `index.html` doit porter un `?v=` dès sa première inclusion. Ne jamais référencer un asset CSS sans cache-buster.
+4. Vérifier l'affichage version côté UI:
+- placeholder `#app-version` dans `avv_assist/index.html` aligné avec la version courante (même si `app.js` l'écrase au runtime).
+
+Objectif:
+- éviter les faux incidents causés par cache navigateur,
+- garder une version lisible et traçable dans les retours utilisateurs.
+
+## 13) Branche de travail principale
+La branche d'intégration du projet est `develop`.
+
+- Toute branche `fix/<x>` ou `feat/<x>` est créée **depuis** `develop` et **mergée dans `develop` via PR** après validation.
+- `main`: branche de release stable, reçoit uniquement les merges validés depuis `develop`.
+- Ne jamais pousser directement sur `main`.
+
+Commande de vérification avant toute nouvelle branche:
+`git branch --show-current` -> doit afficher `develop`
+
+## pi-autoresearch (AVV Assist Pro)
+
+When asked to improve code autonomously:
+- Use skill autoresearch-create to start a benchmark session
+- checks.sh in the repo root defines success criteria
+- Score 100 = TS compiles + no console.log + no secrets
+- autoresearch-finalize commits if score improves, reverts if it drops
