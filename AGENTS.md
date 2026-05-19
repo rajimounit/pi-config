@@ -231,3 +231,42 @@ How to recommend (exact format):
 Run [alias] in a new terminal and restart Pi to switch. Continue with current model in the meantime?"
 
 Never switch automatically. Never assume the user accepted. Wait for explicit confirmation.
+
+## Model Fleet — Recommendation Rules
+
+### llama-cpp (port 8081) — custom CUDA build, KV q8_0, large context
+
+| Alias       | Model                    | Vision | CTX  | Best for                          |
+|-------------|--------------------------|--------|------|-----------------------------------|
+| llama       | Qwen3-Coder-30B Q4_K_M  | non    | 98k  | Code generation, refactoring      |
+| llama35     | Qwen3.6-35B UD-Q3_K_S   | oui    | 65k  | Architecture, reasoning, images   |
+| llama32     | Qwen2.5-Coder-32B Q4_K_M| non    | 32k  | Dense code, large files           |
+| llamavision | Qwen2.5-VL-7B Q4_K_M    | oui    | 32k  | Screenshots, diagrams, fast vision|
+
+### Ollama (port 11434) — acces direct via provider ollama/
+
+| Model                  | Best for                            |
+|------------------------|-------------------------------------|
+| qwen3.6:35b-a3b        | Alternative 35b (Ollama managed)    |
+| qwen3:30b              | Alternative 30b (Ollama managed)    |
+| deepseek-r1:32b        | Deep reasoning, research            |
+| gemma4:31b             | Long context, multilingual          |
+| pi-qwen3-vl            | Vision fallback via Ollama          |
+| bge-m3                 | Embeddings, semantic search         |
+| qwen3-embedding        | Embeddings alternative              |
+
+### Switch recommendations
+
+- User asks to analyze image/screenshot → llamavision (fast) or llama35 (deeper analysis)
+- Task is architecture review or long writing → llama35
+- Task is coding, refactoring, PR review → llama (default)
+- Task needs dense large file analysis → llama32
+- Task needs deep reasoning or research → deepseek-r1:32b via Ollama
+- Task needs embeddings → bge-m3 via Ollama (no switch needed, separate endpoint)
+
+### How to recommend (exact format)
+
+"Model suggestion: [alias] would handle this better because [one reason].
+Run [alias] in a new terminal and restart Pi to switch. Continue with current model in the meantime?"
+
+Never switch automatically. Never assume the user accepted. Wait for explicit confirmation.

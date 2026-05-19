@@ -1,6 +1,6 @@
 #!/bin/bash
 # llama-server multi-model launcher
-# Usage: ./start-llama.sh [30b|35b|32b|7b|9b|vision]
+# Usage: ./start-llama.sh [30b|35b|32b|vision]
 
 export PATH=/usr/local/cuda-12.6/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-12.6/targets/x86_64-linux/lib:/usr/lib/wsl/lib
@@ -13,56 +13,42 @@ MMPROJ=""
 case "${1:-30b}" in
   30b)
     MODEL="$LM/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
-    echo "[llama] Qwen3-Coder-30B-A3B (MoE) - 98k ctx"
+    echo "[llama] Qwen3-Coder-30B-A3B Q4_K_M — 98k ctx"
     ;;
   35b)
-    MODEL="$LM/lmstudio-community/Qwen3.6-35B-A3B-Instruct-GGUF/Qwen3.6-35B-A3B-Instruct-Q4_K_M.gguf"
-    echo "[llama] Qwen3.6-35B-A3B (MoE) - 98k ctx"
+    MODEL="$LM/unsloth/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-UD-Q3_K_S.gguf"
+    MMPROJ="$LM/unsloth/Qwen3.6-35B-A3B-GGUF/mmproj-F32.gguf"
+    CTX=65536
+    echo "[llama] Qwen3.6-35B-A3B UD-Q3_K_S + vision — 65k ctx"
     ;;
   32b)
     MODEL="$LM/lmstudio-community/Qwen2.5-Coder-32B-GGUF/Qwen2.5-Coder-32B-Q4_K_M.gguf"
     CTX=32768
-    echo "[llama] Qwen2.5-Coder-32B - 32k ctx"
-    ;;
-  7b)
-    MODEL="$LM/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF/Qwen2.5-Coder-7B-Instruct-Q4_K_S.gguf"
-    echo "[llama] Qwen2.5-Coder-7B - 98k ctx (fast)"
-    ;;
-  9b)
-    MODEL="$LM/Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled-v2-GGUF/Qwen3.5-9B.Q4_K_M.gguf"
-    echo "[llama] Qwen3.5-9B Reasoning - 98k ctx"
+    echo "[llama] Qwen2.5-Coder-32B Q4_K_M — 32k ctx"
     ;;
   vision)
     MODEL="$LM/bartowski/Qwen_Qwen2.5-VL-7B-Instruct-GGUF/Qwen_Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf"
     MMPROJ="$LM/bartowski/Qwen_Qwen2.5-VL-7B-Instruct-GGUF/mmproj-Qwen_Qwen2.5-VL-7B-Instruct-f16.gguf"
     CTX=32768
-    echo "[llama] Qwen2.5-VL-7B Vision - 32k ctx"
+    echo "[llama] Qwen2.5-VL-7B Q4_K_M + vision — 32k ctx"
     ;;
   *)
-    echo "Usage: $0 [30b|35b|32b|7b|9b|vision]"
+    echo "Usage: $0 [30b|35b|32b|vision]"
     exit 1
     ;;
 esac
 
 echo "[llama] Port: $PORT | CTX: $CTX"
 
-if [ -n "$MMPROJ" ]; then
-  exec ~/llama.cpp/build/bin/llama-server \
-    --model "$MODEL" \
-    --mmproj "$MMPROJ" \
-    --host 127.0.0.1 \
-    --port $PORT \
-    --ctx-size $CTX \
-    --n-gpu-layers 99 \
-    --cache-type-k q8_0 \
-    --cache-type-v q8_0
-else
-  exec ~/llama.cpp/build/bin/llama-server \
-    --model "$MODEL" \
-    --host 127.0.0.1 \
-    --port $PORT \
-    --ctx-size $CTX \
-    --n-gpu-layers 99 \
-    --cache-type-k q8_0 \
-    --cache-type-v q8_0
-fi
+MMPROJ_ARG=""
+[ -n "$MMPROJ" ] && MMPROJ_ARG="--mmproj $MMPROJ"
+
+exec ~/llama.cpp/build/bin/llama-server \
+  --model "$MODEL" \
+  $MMPROJ_ARG \
+  --host 127.0.0.1 \
+  --port $PORT \
+  --ctx-size $CTX \
+  --n-gpu-layers 99 \
+  --cache-type-k q8_0 \
+  --cache-type-v q8_0
