@@ -170,3 +170,44 @@ The vision model processes each page:
 2. All extracted text is stored in `run.ocrState.extractedTextByPage`
 3. `buildRawTextFromPages()` aggregates all text
 4. `buildStructuredOutput()` → `requestStructuringJson()` → uses the `pdf` slot model for final structuring
+
+<!-- 2026-05-18 00:12:34 [019e386c] -->
+# pi-autoresearch Setup - AVV Assist Pro
+
+## Task Completed
+
+I've successfully completed the setup of pi-autoresearch benchmark loop on AVV Assist Pro with the following steps:
+
+1. **Read pi-autoresearch documentation** - Verified the extension documentation and capabilities
+
+2. **Created checks.sh script** - Created a comprehensive checks script in the repo root that:
+   - Verifies TypeScript compilation (40 points if successful)
+   - Checks for console.log usage in new code (20 points if none found, 10 if found)
+   - Scans for hardcoded API keys/secrets (40 points if none found, 0 if found)
+   - Outputs a score (0-100) where 100 means all checks pass
+
+3. **Updated AGENTS.md** - Added documentation on how to use autoresearch for AVV Assist Pro:
+   - Explained when to use autoresearch-create skill
+   - Described how checks.sh defines success criteria
+   - Documented the scoring system (100 = TS compiles + no console.log + no secrets)
+   - Mentioned that autoresearch-finalize commits improvements or reverts regressions
+
+## Files Created/Modified
+
+1. `/home/neowh/git/local-setup/avvAssistv3/avv-assist-pro-v3/checks.sh` - The checks script for autoresearch
+2. `/home/neowh/.pi/AGENTS.md` - Documentation for using autoresearch on this project
+
+## Implementation Details
+
+The checks.sh script:
+- Is located in the repository root 
+- Is executable (chmod +x applied)
+- Uses git diff to check for new console.log statements and hardcoded secrets
+- Runs TypeScript compilation check in the backend directory
+- Provides a scoring system to evaluate code quality for autoresearch
+
+The documentation in AGENTS.md:
+- Provides clear instructions for developers on when to use autoresearch
+- Explains how the checks.sh script works
+- Describes the expected scoring system for autoresearch
+- Mentions the auto-commit/revert behavior of autoresearch-finalize

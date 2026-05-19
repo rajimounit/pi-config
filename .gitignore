@@ -6,3 +6,5 @@ agent/run-history.jsonl
 *.bak
 *.log
 .env
+agent/memory/daily/
+agent/npm/
