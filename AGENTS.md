@@ -270,3 +270,28 @@ Never switch automatically. Never assume the user accepted. Wait for explicit co
 Run [alias] in a new terminal and restart Pi to switch. Continue with current model in the meantime?"
 
 Never switch automatically. Never assume the user accepted. Wait for explicit confirmation.
+
+## Workflow recommandé — Plan-First
+
+Avant toute feature, bug fix ou refactor, suivre le workflow **plan-first** :
+
+1. **Analyser** le projet (structure, package.json, README, TODO existants)
+2. **Poser** au maximum 5 questions critiques en une seule fois
+3. **Créer** un `TODO.md` avec des tâches petites, vérifiables, ordonnées par dépendance
+4. **Demander** approbation utilisateur avant toute exécution
+5. **Exécuter** une tâche à la fois, marquer `[x]` au fur et à mesure
+
+Règles:
+- NEVER write code, create files, or run commands before a TODO.md is approved.
+- NEVER go off-plan. If new work is discovered, add it to TODO.md and ask for approval.
+- Tasks must be small and independently verifiable.
+
+See: `~/.pi/skills/plan-first/SKILL.md` for full workflow specification.
+
+## Skills installés (practitioner-knowledge)
+
+Les skills suivants ont été extraits du repo `practitioner-knowledge` et installés :
+
+- `~/.pi/skills/humanizer/SKILL.md` — Dé-AI-fication du texte (prompt on-demand)
+- `~/.pi/skills/security-threat-model/SKILL.md` — Threat modeling en 7 phases (on-demand)
+- `~/.pi/prompts/threat-model-summary.md` — Template générique pour résumé de repo (prompt template)
