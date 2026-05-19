@@ -1,3 +1,4 @@
+<!-- usage: do a threat model on this codebase -->
 ---
 name: security-threat-model
 version: 1.0.0

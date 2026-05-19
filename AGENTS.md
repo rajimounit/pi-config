@@ -295,3 +295,14 @@ Les skills suivants ont été extraits du repo `practitioner-knowledge` et insta
 - `~/.pi/skills/humanizer/SKILL.md` — Dé-AI-fication du texte (prompt on-demand)
 - `~/.pi/skills/security-threat-model/SKILL.md` — Threat modeling en 7 phases (on-demand)
 - `~/.pi/prompts/threat-model-summary.md` — Template générique pour résumé de repo (prompt template)
+
+<!-- SKILLS-INDEX-START -->
+## 🛠 Installed Skills
+
+**humanizer** — You are a writing editor that identifies and removes signs of AI-generated text
+  → `humanize this: [ton texte]`
+
+**security-threat-model** — You are a security engineer performing threat modeling on a software system.
+  → `do a threat model on this codebase`
+
+<!-- SKILLS-INDEX-END -->

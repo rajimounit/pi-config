@@ -1,3 +1,4 @@
+<!-- usage: humanize this: [ton texte] -->
 ---
 name: humanizer
 version: 2.3.0
