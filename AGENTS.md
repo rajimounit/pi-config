@@ -199,3 +199,35 @@ When asked to improve code autonomously:
 - checks.sh in the repo root defines success criteria
 - Score 100 = TS compiles + no console.log + no secrets
 - autoresearch-finalize commits if score improves, reverts if it drops
+## Model Fleet — Recommendation Rules
+
+Available models via llama-cpp (port 8081):
+
+| Alias       | Model                       | Best for                         | Speed    |
+|-------------|-----------------------------|----------------------------------|----------|
+| llama       | Qwen3-Coder-30B-A3B         | Code generation, refactoring     | ~76 t/s  |
+| llama35     | Qwen3.6-35B-A3B             | Architecture, reasoning, writing | ~60 t/s  |
+| llama32     | Qwen2.5-Coder-32B           | Large code context, dense code   | ~40 t/s  |
+| llama7      | Qwen2.5-Coder-7B            | Quick edits, fast answers        | ~180 t/s |
+| llama9      | Qwen3.5-9B Reasoning        | Logic, math, chain-of-thought    | ~150 t/s |
+| llamavision | Qwen2.5-VL-7B               | Images, screenshots, diagrams    | ~50 t/s  |
+
+Available via Ollama:
+
+| Model           | Best for                      |
+|-----------------|-------------------------------|
+| pi-qwen3-vl     | Vision fallback (Ollama)      |
+| deepseek-r1:32b | Deep reasoning, research      |
+
+When to suggest a model switch:
+- User asks to analyze an image or screenshot -> suggest llamavision
+- Task is a quick fix or single-line change -> suggest llama7 (2x faster)
+- Task requires architecture review or long-form writing -> suggest llama35
+- Task involves math, logic, or multi-step reasoning -> suggest llama9
+- Currently on non-coder model and user opens a coding task -> suggest llama
+
+How to recommend (exact format):
+"Model suggestion: [alias] would handle this better because [one reason].
+Run [alias] in a new terminal and restart Pi to switch. Continue with current model in the meantime?"
+
+Never switch automatically. Never assume the user accepted. Wait for explicit confirmation.
