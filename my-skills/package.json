@@ -1,0 +1,9 @@
+{
+  "name": "pi-my-skills",
+  "version": "1.0.0",
+  "description": "Custom skills: humanizer, security-threat-model",
+  "keywords": ["pi-package"],
+  "pi": {
+    "skills": ["./skills"]
+  }
+}
